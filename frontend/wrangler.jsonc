@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "contract-analyzer-demo",
+  "name": "contract-analyzer",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-06-18",
   "compatibility_flags": [
@@ -14,7 +14,7 @@
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "contract-analyzer-demo"
+      "service": "contract-analyzer"
     }
   ],
   "observability": {
