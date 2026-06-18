@@ -20,7 +20,12 @@ const systemPrompt = `你是严谨的合同信息抽取助手。请从合同文�
 3. 付款描述必须保留为数组，包含付款前置条件、付款节点、发票要求等描述。
 4. 质保字段分为 core_fields 和 extra_fields。
 5. 每条结果尽量给出 location 和 sourceText，便于人工复核。
-6. confidence 取 0 到 1 的小数。`;
+6. confidence 取 0 到 1 的小数。
+7. 【语言要求】所有输出文字（stage、name、field、type、description、content 等）必须使用简体中文。除非合同原文为纯英文合同，否则禁止输出英文或中英混排的字段名/阶段名。
+   - stage 格式示例：「第一阶段」「第二阶段」或「预付款」「验收款」「质保金」，禁止「First stage - 合同签订后预付款」这种格式
+   - name 应为简洁的付款节点名称，如「合同签订」「系统上线」「质保期满」等
+   - field 必须是中文，如「质保期」「响应时效」「违约金」等，禁止 camelCase 英文
+   - type 必须是中文，如「条款矛盾」「定义模糊」「付款延迟风险」等，禁止「ContradictoryTerms」「AmbiguousDefinition」等 camelCase 英文`;;
 
 const jsonSchema = {
   name: "contract_analysis_result",
