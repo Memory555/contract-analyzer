@@ -46,3 +46,21 @@ NEXT_PUBLIC_DEMO_MODE=true
 - 模型抽取提示词：`app/api/analyze/route.ts`
 
 当前不是传统单个静态 HTML 文件，而是 Next.js 应用。修改 `app/page.tsx` 后需要重新部署或重新构建。
+
+## Cloudflare 部署
+
+项目已补充 Cloudflare Workers + OpenNext 适配，保留现有 Vercel 部署方式不变。
+
+常用命令：
+
+```bash
+npm run cf:build
+npm run cf:preview
+npm run cf:deploy
+```
+
+完整配置和控制台部署流程见：
+
+```text
+../docs/Cloudflare部署说明.md
+```

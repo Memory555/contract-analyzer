@@ -4,6 +4,8 @@ frontend/node_modules/
 
 # Next.js / build outputs
 .next/
+frontend/.open-next/
+frontend/.wrangler/
 frontend/.next/
 out/
 frontend/out/
@@ -65,4 +67,3 @@ desktop.ini
 *.swo
 .idea/
 .vscode/
-

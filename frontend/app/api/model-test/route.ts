@@ -41,7 +41,7 @@ function resolveModelConfig(data: z.infer<typeof requestSchema>) {
       ok: false as const,
       status: 428,
       code: "MODEL_SERVICE_NOT_CONFIGURED",
-      message: "尚未配置模型服务，请填写 API Key，或在 Vercel 环境变量中配置 OPENAI_API_KEY。"
+      message: "尚未配置模型服务，请填写 API Key，或在部署平台环境变量中配置 OPENAI_API_KEY。"
     };
   }
 

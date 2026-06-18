@@ -1,4 +1,6 @@
 .next/
+.open-next/
+.wrangler/
 node_modules/
 out/
 .env
@@ -15,3 +17,4 @@ tmp/
 temp/
 uploads/
 downloads/
+cloudflare-env.d.ts
