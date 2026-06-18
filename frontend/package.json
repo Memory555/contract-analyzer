@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.19.11",
     "@vitejs/plugin-react": "^4.7.0",
     "dexie": "^4.2.1",
     "exceljs": "^4.4.0",
@@ -26,6 +27,7 @@
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.2",
     "eslint-config-next": "^15.5.7",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.101.0"
   }
 }
