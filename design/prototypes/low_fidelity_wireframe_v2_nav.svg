@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1680" height="1050" viewBox="0 0 1680 1050">
+  <rect width="1680" height="1050" fill="#f4f7fb"/>
+
+  <rect x="0" y="0" width="256" height="1050" fill="#102033"/>
+  <rect x="28" y="28" width="42" height="42" rx="8" fill="#2f74c0"/>
+  <text x="49" y="56" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="18" font-weight="700" fill="#ffffff">LOGO</text>
+  <text x="84" y="50" font-family="Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="700" fill="#ffffff">飞渡</text>
+  <text x="84" y="73" font-family="Microsoft YaHei, Arial, sans-serif" font-size="13" fill="#9fb1c8">合同智能平台</text>
+
+  <text x="28" y="128" font-family="Microsoft YaHei, Arial, sans-serif" font-size="13" fill="#7890ad">主导航</text>
+  <rect x="16" y="152" width="224" height="48" rx="8" fill="#223a56"/>
+  <rect x="16" y="152" width="4" height="48" rx="2" fill="#4aa3ff"/>
+  <text x="44" y="182" font-family="Microsoft YaHei, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">合同分析</text>
+  <text x="44" y="234" font-family="Microsoft YaHei, Arial, sans-serif" font-size="16" fill="#b8c7da">工作台</text>
+  <text x="44" y="282" font-family="Microsoft YaHei, Arial, sans-serif" font-size="16" fill="#b8c7da">问题审查</text>
+  <text x="44" y="330" font-family="Microsoft YaHei, Arial, sans-serif" font-size="16" fill="#b8c7da">导出中心</text>
+  <text x="44" y="378" font-family="Microsoft YaHei, Arial, sans-serif" font-size="16" fill="#b8c7da">设置</text>
+
+  <rect x="20" y="920" width="216" height="84" rx="8" fill="#172b44"/>
+  <text x="40" y="954" font-family="Microsoft YaHei, Arial, sans-serif" font-size="14" fill="#b8c7da">AI 结果仅供参考</text>
+  <text x="40" y="982" font-family="Microsoft YaHei, Arial, sans-serif" font-size="13" fill="#7890ad">建议人工复核关键条款</text>
+
+  <rect x="256" y="0" width="1424" height="84" fill="#ffffff"/>
+  <line x1="256" y1="84" x2="1680" y2="84" stroke="#d9e1ec" stroke-width="2"/>
+  <text x="296" y="38" font-family="Microsoft YaHei, Arial, sans-serif" font-size="14" fill="#607086">合同分析 / 单合同解析</text>
+  <text x="296" y="66" font-family="Microsoft YaHei, Arial, sans-serif" font-size="26" font-weight="700" fill="#182033">上传合同并生成结构化分析结果</text>
+  <rect x="1388" y="24" width="128" height="36" rx="18" fill="#eef6ff"/>
+  <text x="1452" y="47" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="14" fill="#275e9f">V1.0 单合同</text>
+  <rect x="1536" y="24" width="96" height="36" rx="18" fill="#f5f7fa"/>
+  <text x="1584" y="47" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="14" fill="#607086">无登录</text>
+
+  <rect x="296" y="116" width="906" height="244" rx="8" fill="#ffffff" stroke="#d9e1ec" stroke-width="2"/>
+  <text x="328" y="155" font-family="Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="700" fill="#182033">上传合同</text>
+  <text x="438" y="155" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" fill="#8a96a8">支持 PDF / DOC / DOCX，单文件 ≤ 20MB</text>
+  <rect x="328" y="184" width="842" height="124" rx="8" fill="#f8fbff" stroke="#7aa7d9" stroke-width="3" stroke-dasharray="12 10"/>
+  <text x="749" y="236" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="26" font-weight="700" fill="#275e9f">点击或拖拽上传合同</text>
+  <text x="749" y="274" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="16" fill="#607086">上传后自动解析付款计划、质保明细和合同问题</text>
+  <rect x="328" y="326" width="842" height="10" rx="5" fill="#e7edf5"/>
+  <rect x="328" y="326" width="286" height="10" rx="5" fill="#2f74c0"/>
+  <text x="328" y="350" font-family="Microsoft YaHei, Arial, sans-serif" font-size="14" fill="#607086">上传中 / 解析中状态示例</text>
+
+  <rect x="1230" y="116" width="410" height="244" rx="8" fill="#ffffff" stroke="#d9e1ec" stroke-width="2"/>
+  <text x="1262" y="155" font-family="Microsoft YaHei, Arial, sans-serif" font-size="22" font-weight="700" fill="#182033">任务摘要</text>
+  <rect x="1262" y="182" width="346" height="38" rx="6" fill="#eef6ff"/>
+  <text x="1282" y="207" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" fill="#275e9f">解析状态：正在分析合同</text>
+  <rect x="1262" y="232" width="346" height="38" rx="6" fill="#f5f7fa"/>
+  <text x="1282" y="257" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" fill="#475569">合同文件：飞渡采购合同模板.docx</text>
+  <rect x="1262" y="282" width="166" height="54" rx="6" fill="#fff7f3" stroke="#f0b099"/>
+  <text x="1345" y="315" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="16" font-weight="700" fill="#a94725">2 个问题</text>
+  <rect x="1442" y="282" width="166" height="54" rx="6" fill="#2f74c0"/>
+  <text x="1525" y="315" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">下载 Excel</text>
+
+  <text x="296" y="414" font-family="Microsoft YaHei, Arial, sans-serif" font-size="24" font-weight="700" fill="#182033">分析结果</text>
+  <text x="404" y="414" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" fill="#8a96a8">优先展示风险，再展示结构化明细</text>
+
+  <rect x="296" y="440" width="1344" height="108" rx="8" fill="#fff7f3" stroke="#f0b099" stroke-width="2"/>
+  <text x="328" y="480" font-family="Microsoft YaHei, Arial, sans-serif" font-size="21" font-weight="700" fill="#a94725">合同问题提示</text>
+  <rect x="328" y="500" width="112" height="30" rx="15" fill="#de4d35"/>
+  <text x="384" y="521" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" font-weight="700" fill="#ffffff">条款矛盾</text>
+  <text x="462" y="521" font-family="Microsoft YaHei, Arial, sans-serif" font-size="16" fill="#5f392e">5.4 条质保期 3 年，与 7.1 条质保期 1 年不一致</text>
+  <rect x="956" y="500" width="112" height="30" rx="15" fill="#f3a63b"/>
+  <text x="1012" y="521" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" font-weight="700" fill="#ffffff">定义模糊</text>
+  <text x="1090" y="521" font-family="Microsoft YaHei, Arial, sans-serif" font-size="16" fill="#5f392e">“合理期限内”建议量化</text>
+
+  <rect x="296" y="578" width="1344" height="204" rx="8" fill="#ffffff" stroke="#d9e1ec" stroke-width="2"/>
+  <text x="328" y="618" font-family="Microsoft YaHei, Arial, sans-serif" font-size="21" font-weight="700" fill="#182033">付款计划明细</text>
+  <rect x="328" y="640" width="1280" height="42" fill="#eef3f8"/>
+  <text x="354" y="667" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" font-weight="700" fill="#344054">阶段</text>
+  <text x="498" y="667" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" font-weight="700" fill="#344054">比例</text>
+  <text x="650" y="667" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" font-weight="700" fill="#344054">付款描述</text>
+  <text x="1070" y="667" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" font-weight="700" fill="#344054">支付时限</text>
+  <text x="1320" y="667" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" font-weight="700" fill="#344054">备注</text>
+  <text x="354" y="718" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" fill="#475569">第一阶段</text>
+  <text x="498" y="718" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" fill="#475569">30%</text>
+  <text x="650" y="718" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" fill="#475569">合同签订后；收到首付款；提供专票</text>
+  <text x="1070" y="718" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" fill="#475569">60 个工作日</text>
+  <text x="1320" y="718" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" fill="#475569">背靠背付款</text>
+  <line x1="328" y1="744" x2="1608" y2="744" stroke="#edf1f5"/>
+  <text x="354" y="766" font-family="Microsoft YaHei, Arial, sans-serif" font-size="14" fill="#8a96a8">后续阶段按行展示，付款描述支持多行换行</text>
+
+  <rect x="296" y="812" width="1344" height="188" rx="8" fill="#ffffff" stroke="#d9e1ec" stroke-width="2"/>
+  <text x="328" y="852" font-family="Microsoft YaHei, Arial, sans-serif" font-size="21" font-weight="700" fill="#182033">质保明细</text>
+  <rect x="328" y="878" width="198" height="42" rx="5" fill="#eef3f8"/>
+  <text x="427" y="905" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" font-weight="700" fill="#344054">质保期</text>
+  <rect x="546" y="878" width="198" height="42" rx="5" fill="#eef3f8"/>
+  <text x="645" y="905" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" font-weight="700" fill="#344054">服务范围</text>
+  <rect x="764" y="878" width="198" height="42" rx="5" fill="#eef3f8"/>
+  <text x="863" y="905" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" font-weight="700" fill="#344054">响应时效</text>
+  <rect x="982" y="878" width="198" height="42" rx="5" fill="#eef3f8"/>
+  <text x="1081" y="905" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" font-weight="700" fill="#344054">违约金</text>
+  <rect x="1200" y="878" width="198" height="42" rx="5" fill="#eef3f8"/>
+  <text x="1299" y="905" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" font-weight="700" fill="#344054">升级维护</text>
+  <rect x="1418" y="878" width="190" height="42" rx="5" fill="#eef3f8"/>
+  <text x="1513" y="905" text-anchor="middle" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" font-weight="700" fill="#344054">期满安排</text>
+  <text x="328" y="956" font-family="Microsoft YaHei, Arial, sans-serif" font-size="15" fill="#607086">建议正式交互中支持“字段卡片 + 详细表格”切换，兼顾阅读和导出字段一致性。</text>
+</svg>

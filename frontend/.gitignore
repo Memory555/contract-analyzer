@@ -1,0 +1,17 @@
+.next/
+node_modules/
+out/
+.env
+.env.*
+!.env.example
+.env.local
+npm-debug.log*
+.next-start*.log
+*.log
+coverage/
+playwright-report/
+test-results/
+tmp/
+temp/
+uploads/
+downloads/

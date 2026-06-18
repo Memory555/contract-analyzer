@@ -1,0 +1,68 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Next.js / build outputs
+.next/
+frontend/.next/
+out/
+frontend/out/
+dist/
+build/
+
+# Environment variables and local secrets
+.env
+.env.*
+!.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Runtime logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+frontend/.next-start*.log
+
+# Local caches
+.turbo/
+.vercel/
+.cache/
+coverage/
+playwright-report/
+test-results/
+
+# Temporary and uploaded files
+tmp/
+temp/
+uploads/
+downloads/
+*.tmp
+*.temp
+
+# Contract/source documents and generated analysis artifacts
+*.doc
+*.docx
+*.pdf
+*.xls
+*.xlsx
+*.csv
+*.tsv
+*.zip
+*.7z
+*.rar
+
+# Keep project design/source assets that are intentionally committed
+!frontend/public/feidu-logo.png
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+.idea/
+.vscode/
+
