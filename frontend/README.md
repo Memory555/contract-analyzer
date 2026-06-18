@@ -1,6 +1,6 @@
 # 合同智能分析平台 Demo
 
-这是早期 Demo 版本，采用 Next.js + Vercel 方案，仅支持 DOCX。
+这是早期 Demo 版本，采用 Next.js 方案，仅支持 DOCX。
 
 ## 本地运行
 
@@ -38,3 +38,11 @@ NEXT_PUBLIC_DEMO_MODE=true
 - IndexedDB 保存最近记录
 - ExcelJS 前端导出
 
+## 文字内容调整位置
+
+- 页面主要展示文案：`app/page.tsx`
+- 浏览器标题和图标：`app/layout.tsx`
+- 样式：`app/globals.css`
+- 模型抽取提示词：`app/api/analyze/route.ts`
+
+当前不是传统单个静态 HTML 文件，而是 Next.js 应用。修改 `app/page.tsx` 后需要重新部署或重新构建。

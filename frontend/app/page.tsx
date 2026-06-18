@@ -17,7 +17,8 @@ import {
 } from "lucide-react";
 import { extractDocxText, validateDocxFile } from "@/lib/docx";
 import { exportAnalysisExcel } from "@/lib/excel";
-import { cleanupExpiredRecords, listRecentRecords, saveAnalysisRecord } from "@/lib/local-db";
+import { cleanupExpiredRecords, clearLocalDatabase, listRecentRecords, saveAnalysisRecord } from "@/lib/local-db";
+import { normalizeAnalysisResult } from "@/lib/normalize";
 import type {
   AnalysisRecord,
   AnalysisResult,
@@ -50,18 +51,21 @@ const severityMap = {
   info: "提示"
 };
 
+const SETTINGS_STORAGE_KEY = "contract-analyzer-demo-settings-v2";
+const LEGACY_SETTINGS_STORAGE_KEY = "contract-analyzer-demo-settings";
+
 const placeholderCopy: Record<Exclude<PageKey, "analysis" | "settings">, { title: string; body: string }> = {
   dashboard: {
     title: "工作台",
-    body: "这里后续会展示最近分析任务、问题统计、待复核事项和导出概览。"
+    body: "占位符内容"
   },
   review: {
     title: "问题审查",
-    body: "这里后续会聚合合同中的条款矛盾、数值缺失、逻辑冲突和提示类问题。"
+    body: "占位符内容"
   },
   exports: {
     title: "导出中心",
-    body: "这里后续会管理 Excel 导出记录、导出模板和批量下载任务。"
+    body: "占位符内容"
   }
 };
 
@@ -79,8 +83,8 @@ export default function Home() {
   const [records, setRecords] = useState<AnalysisRecord[]>([]);
   const [llmSettings, setLlmSettings] = useState<LlmSettings>({
     openaiApiKey: "",
-    openaiBaseUrl: "https://api.openai.com/v1",
-    openaiModel: "gpt-4.1-mini"
+    openaiBaseUrl: "",
+    openaiModel: ""
   });
 
   const issueCounts = useMemo(() => {
@@ -94,7 +98,8 @@ export default function Home() {
 
   useEffect(() => {
     void cleanupExpiredRecords(15).then(refreshRecords);
-    const saved = window.localStorage.getItem("contract-analyzer-demo-settings");
+    window.localStorage.removeItem(LEGACY_SETTINGS_STORAGE_KEY);
+    const saved = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
     if (saved) {
       setLlmSettings((current) => ({ ...current, ...JSON.parse(saved) }));
     }
@@ -123,15 +128,18 @@ export default function Home() {
       const contractText = await extractDocxText(file);
 
       setStatus("analyzing");
+      const pageApiKey = llmSettings.openaiApiKey.trim();
+      const pageBaseUrl = llmSettings.openaiBaseUrl.trim();
+      const pageModel = llmSettings.openaiModel.trim();
       const response = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fileName: file.name,
           contractText,
-          openaiApiKey: llmSettings.openaiApiKey.trim() || undefined,
-          openaiBaseUrl: llmSettings.openaiBaseUrl.trim() || undefined,
-          openaiModel: llmSettings.openaiModel.trim() || undefined
+          openaiApiKey: pageApiKey || undefined,
+          openaiBaseUrl: pageBaseUrl || undefined,
+          openaiModel: pageModel || undefined
         })
       });
 
@@ -140,12 +148,7 @@ export default function Home() {
         throw new Error(data.message || "解析失败，请重试。");
       }
 
-      const analysis: AnalysisResult = {
-        issues: data.issues,
-        payment_plan: data.payment_plan,
-        warranty: data.warranty,
-        confidence: data.confidence
-      };
+      const analysis: AnalysisResult = normalizeAnalysisResult(data);
 
       setResult(analysis);
       setMessage(data.message || (data.demo ? "当前为演示数据。" : "解析完成。"));
@@ -192,7 +195,7 @@ export default function Home() {
 
   function saveSettings(nextSettings: LlmSettings) {
     setLlmSettings(nextSettings);
-    window.localStorage.setItem("contract-analyzer-demo-settings", JSON.stringify(nextSettings));
+    window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(nextSettings));
     setMessage("设置已保存到当前浏览器。");
   }
 
@@ -247,13 +250,8 @@ export default function Home() {
           <>
             <header className="topbar">
               <div>
-                <p>合同分析 / 单合同解析</p>
+                <p>合同分析</p>
                 <h1>上传 DOCX 合同并生成结构化分析结果</h1>
-              </div>
-              <div className="badges">
-                <span>Demo V0.1</span>
-                <span>DOCX only</span>
-                <span>Vercel ready</span>
               </div>
             </header>
 
@@ -331,7 +329,22 @@ export default function Home() {
             <HistoryPanel records={records} onLoadRecord={loadRecord} />
           </>
         ) : activePage === "settings" ? (
-          <SettingsPage settings={llmSettings} onSave={saveSettings} />
+          <SettingsPage
+            settings={llmSettings}
+            onSave={saveSettings}
+            onClearLocalData={async () => {
+              await clearLocalDatabase();
+              window.localStorage.clear();
+              window.sessionStorage.clear();
+              setRecords([]);
+              setResult(null);
+              setFileName("");
+              setError("");
+              setMessage("");
+              setStatus("idle");
+              setLlmSettings({ openaiApiKey: "", openaiBaseUrl: "", openaiModel: "" });
+            }}
+          />
         ) : (
           <PlaceholderPage page={activePage} />
         )}
@@ -446,18 +459,53 @@ function AnalysisResultView({
 
 function SettingsPage({
   settings,
-  onSave
+  onSave,
+  onClearLocalData
 }: {
   settings: LlmSettings;
   onSave: (settings: LlmSettings) => void;
+  onClearLocalData: () => Promise<void>;
 }) {
   const [draft, setDraft] = useState(settings);
   const [openSection, setOpenSection] = useState<"model" | "about">("model");
   const [savedFlash, setSavedFlash] = useState(false);
+  const [testStatus, setTestStatus] = useState<{
+    type: "idle" | "testing" | "success" | "error";
+    message: string;
+  }>({ type: "idle", message: "" });
+  const [clearFlash, setClearFlash] = useState(false);
 
   useEffect(() => {
     setDraft(settings);
   }, [settings]);
+
+  async function testModelService() {
+    setTestStatus({ type: "testing", message: "正在测试模型服务连通性..." });
+    try {
+      const response = await fetch("/api/model-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          openaiApiKey: draft.openaiApiKey.trim() || undefined,
+          openaiBaseUrl: draft.openaiBaseUrl.trim() || undefined,
+          openaiModel: draft.openaiModel.trim() || undefined
+        })
+      });
+      const data = (await response.json()) as { message?: string; model?: string; baseURL?: string };
+      if (!response.ok) {
+        throw new Error(data.message || "模型服务联通测试失败。");
+      }
+      setTestStatus({
+        type: "success",
+        message: `联通成功：${data.model || "当前模型"}，${data.baseURL || "当前地址"}`
+      });
+    } catch (error) {
+      setTestStatus({
+        type: "error",
+        message: error instanceof Error ? error.message : "模型服务联通测试失败。"
+      });
+    }
+  }
 
   return (
     <>
@@ -468,7 +516,7 @@ function SettingsPage({
         </div>
         <div className="badges">
           <span>本地保存</span>
-          <span>Demo 配置</span>
+          <span>模型配置</span>
         </div>
       </header>
 
@@ -488,7 +536,7 @@ function SettingsPage({
                 <input
                   value={draft.openaiBaseUrl}
                   onChange={(event) => setDraft({ ...draft, openaiBaseUrl: event.target.value })}
-                  placeholder="https://api.openai.com/v1"
+                  placeholder="留空或官方地址走全局变量；自定义地址需填写 API Key"
                 />
               </label>
               <label>
@@ -497,7 +545,7 @@ function SettingsPage({
                   value={draft.openaiApiKey}
                   onChange={(event) => setDraft({ ...draft, openaiApiKey: event.target.value })}
                   type="password"
-                  placeholder="不填写则使用服务端环境变量；若服务端也未配置，将无法解析"
+                  placeholder="官方地址可留空走全局变量；自定义地址需填写"
                 />
               </label>
               <label>
@@ -505,23 +553,33 @@ function SettingsPage({
                 <input
                   value={draft.openaiModel}
                   onChange={(event) => setDraft({ ...draft, openaiModel: event.target.value })}
-                  placeholder="gpt-4.1-mini"
+                  placeholder="留空则使用 Vercel 环境变量 OPENAI_MODEL"
                 />
               </label>
-              <p className="settings-note">
-                Demo 支持在浏览器临时配置 Key。正式生产环境建议使用 Vercel 服务端环境变量，减少密钥暴露风险。
-              </p>
-              <button
-                className={savedFlash ? "primary settings-save saved" : "primary settings-save"}
-                type="button"
-                onClick={() => {
-                  onSave(draft);
-                  setSavedFlash(true);
-                  window.setTimeout(() => setSavedFlash(false), 1600);
-                }}
-              >
-                {savedFlash ? "已保存" : "保存设置"}
-              </button>
+              <div className="settings-actions">
+                <button
+                  className={savedFlash ? "primary settings-save saved" : "primary settings-save"}
+                  type="button"
+                  onClick={() => {
+                    onSave(draft);
+                    setSavedFlash(true);
+                    window.setTimeout(() => setSavedFlash(false), 1600);
+                  }}
+                >
+                  {savedFlash ? "已保存" : "保存设置"}
+                </button>
+                <button
+                  className="secondary settings-test"
+                  type="button"
+                  disabled={testStatus.type === "testing"}
+                  onClick={() => void testModelService()}
+                >
+                  {testStatus.type === "testing" ? "测试中..." : "联通测试"}
+                </button>
+              </div>
+              {testStatus.type !== "idle" ? (
+                <p className={`test-result ${testStatus.type}`}>{testStatus.message}</p>
+              ) : null}
             </div>
           ) : null}
         </article>
@@ -549,8 +607,8 @@ function SettingsPage({
                   <dd>仅 DOCX</dd>
                 </div>
                 <div>
-                  <dt>部署形态</dt>
-                  <dd>Next.js / Vercel</dd>
+                  <dt>页面形态</dt>
+                  <dd>Next.js</dd>
                 </div>
                 <div>
                   <dt>数据说明</dt>
@@ -559,6 +617,33 @@ function SettingsPage({
               </dl>
             </div>
           ) : null}
+        </article>
+
+        <article className="settings-item">
+          <button className="settings-summary" type="button">
+            <span>
+              <strong>本地数据管理</strong>
+              <small>清除当前浏览器中保存的模型配置、合同分析记录和临时状态</small>
+            </span>
+          </button>
+          <div className="settings-content settings-panel">
+            <p className="settings-note">
+              该操作只影响当前浏览器，不会删除已经下载到电脑上的 Excel 文件，也不会影响 Vercel 环境变量。
+            </p>
+            <button
+              className={clearFlash ? "danger-button cleared" : "danger-button"}
+              type="button"
+              onClick={async () => {
+                await onClearLocalData();
+                setDraft({ openaiApiKey: "", openaiBaseUrl: "", openaiModel: "" });
+                setTestStatus({ type: "idle", message: "" });
+                setClearFlash(true);
+                window.setTimeout(() => setClearFlash(false), 1600);
+              }}
+            >
+              {clearFlash ? "已清除" : "清除本地数据"}
+            </button>
+          </div>
         </article>
       </section>
     </>

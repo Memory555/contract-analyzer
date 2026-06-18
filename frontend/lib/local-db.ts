@@ -29,3 +29,7 @@ export async function cleanupExpiredRecords(retentionDays = 15) {
   cutoff.setDate(cutoff.getDate() - retentionDays);
   await db.records.where("createdAt").below(cutoff.toISOString()).delete();
 }
+
+export async function clearLocalDatabase() {
+  await db.records.clear();
+}

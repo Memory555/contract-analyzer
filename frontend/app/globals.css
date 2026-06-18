@@ -631,6 +631,62 @@ td span {
   color: #ffffff;
 }
 
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.settings-test {
+  min-width: 120px;
+}
+
+.settings-test:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.test-result {
+  margin: 0;
+  border-radius: 6px;
+  padding: 12px 14px;
+  line-height: 1.6;
+}
+
+.test-result.testing {
+  color: #275e9f;
+  background: var(--blue-soft);
+}
+
+.test-result.success {
+  color: #1f7a4d;
+  background: #ecfdf3;
+}
+
+.test-result.error {
+  color: var(--red);
+  background: var(--red-soft);
+}
+
+.danger-button {
+  border: 0;
+  border-radius: 6px;
+  min-height: 40px;
+  padding: 0 16px;
+  max-width: 220px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--red);
+}
+
+.danger-button.cleared {
+  background: #f0a8a0;
+}
+
 .about-panel p {
   color: #42526b;
   line-height: 1.8;

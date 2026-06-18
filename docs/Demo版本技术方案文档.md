@@ -34,6 +34,7 @@ Demo 版本不追求完整文件兼容和生产级后端能力。
 - Excel 下载。
 - 浏览器本地保存最近分析记录，并定期清理超过 15 天的数据。
 - 浏览器临时配置模型服务，包括 OpenAI-compatible `base_url`、API Key 和模型名。
+- 设置页提供模型服务联通测试，用于在上传合同前验证 Base URL、API Key 和模型名是否可用。
 
 ### 2.2 Demo 不包含
 
@@ -72,8 +73,8 @@ Demo 阶段建议使用一个 Next.js 项目承载前端页面和 API Routes。
 | 部署 | Vercel |
 | UI | Ant Design 或自定义 CSS |
 | DOCX 解析 | mammoth.js |
-| LLM 调用 | OpenAI JavaScript SDK |
-| 结构化输出 | OpenAI Structured Outputs / JSON Schema |
+| LLM 调用 | OpenAI JavaScript SDK；官方 OpenAI 地址走 Responses API，自定义 OpenAI-compatible 地址走 Chat Completions |
+| 结构化输出 | 官方 OpenAI 使用 Structured Outputs / JSON Schema；自定义地址使用 JSON 输出约束 |
 | 本地数据库 | IndexedDB，建议使用 Dexie.js |
 | Excel 生成 | ExcelJS |
 
@@ -159,7 +160,27 @@ OPENAI_MODEL=...
 - Demo 阶段允许用户在设置页临时填写 API Key，并保存在当前浏览器本地；正式生产环境仍建议只使用 Vercel 服务端环境变量。
 - `OPENAI_BASE_URL` 为空时使用 SDK 默认地址。
 - `OPENAI_BASE_URL` 有值时传入 SDK client。
-- 若浏览器设置和服务端环境变量都没有提供 API Key，系统不返回演示结果，而是提示用户先到“设置”配置模型服务。
+- 若页面未填写 API Key，官方 OpenAI 地址或空 Base URL 默认使用 Vercel 环境变量。
+- 若页面未填写 API Key，但填写了官方 OpenAI Base URL 或模型名，Base URL / Model 可覆盖默认值，API Key 仍使用 Vercel 环境变量。
+- 若页面填写了自定义 Base URL，必须同时填写该服务对应的 API Key，避免把全局 OpenAI Key 误用于自定义服务。
+- 若页面设置和服务端环境变量都没有可用 API Key，系统不返回演示结果，而是提示用户配置模型服务。
+
+接口兼容策略：
+
+- 官方 OpenAI Base URL：使用 Responses API + JSON Schema。
+- 自定义 OpenAI-compatible Base URL：使用 Chat Completions + JSON 输出约束。
+- 该策略用于兼容部分只支持 `/chat/completions`、不支持 Responses API 的模型服务。
+
+自定义 OpenAI-compatible 服务的当前生成参数：
+
+```text
+temperature=0.2
+top_p=1
+max_tokens=8192
+stream=false
+```
+
+合同文本请求上限为 300000 字符。Demo 阶段仍是单次全量输入；如果后续合同更长或模型仍只关注开头，应升级为“条款检索 / 分段抽取 / 汇总校验”的多步流程。
 
 ### 7.2 API Route
 
