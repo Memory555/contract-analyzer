@@ -227,10 +227,12 @@ D:\feidu\工具1\contract-analyzer\frontend
 | 项目 | 设置 |
 |------|------|
 | Framework Preset | Next.js |
-| Root Directory | `frontend` |
+| Root Directory | `frontend`，必须设置 |
 | Build Command | `npm run build` |
 | Output Directory | 默认即可 |
 | Install Command | `npm install` |
+
+注意：当前 Git 仓库根目录是 `contract-analyzer`，但真正的 Next.js 应用在 `contract-analyzer/frontend`。如果 Vercel 的 Root Directory 仍使用仓库根目录，Vercel 找不到 Next.js 页面入口，部署后访问域名可能出现 `404 NOT_FOUND`。
 
 ### 6.3 环境变量
 
@@ -263,6 +265,29 @@ NEXT_PUBLIC_DEMO_MODE=true
 - Excel 是否能下载。
 - 刷新页面后本地历史记录是否仍在。
 - 超过 15 天的 IndexedDB 历史记录会在应用启动时自动清理。
+
+### 6.5 Vercel `NOT_FOUND` 排查
+
+如果部署后页面显示：
+
+```text
+404 NOT_FOUND
+```
+
+优先检查：
+
+1. Vercel 项目的 Root Directory 是否设置为 `frontend`。
+2. Build Logs 中是否出现 `Next.js`、`next build` 和 `/` 路由。
+3. 是否访问的是当前 Production Deployment URL，而不是已删除或过期的 Preview Deployment URL。
+4. GitHub 仓库是否已经提交 `frontend/package.json`、`frontend/app/page.tsx`、`frontend/app/api/analyze/route.ts`。
+
+正确构建时，Vercel 日志中应能看到类似路由：
+
+```text
+Route (app)
+┌ ○ /
+└ ƒ /api/analyze
+```
 
 ## 7. 后续建议
 
