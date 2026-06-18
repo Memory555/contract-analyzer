@@ -286,6 +286,61 @@ button {
   background: var(--red-soft);
 }
 
+.pending-files {
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdff;
+  overflow: hidden;
+}
+
+.pending-files-title {
+  min-height: 42px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #f1f6fc;
+}
+
+.pending-files-title span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.pending-file-list {
+  display: grid;
+  max-height: 190px;
+  overflow: auto;
+}
+
+.pending-file {
+  min-height: 40px;
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid #edf1f5;
+}
+
+.pending-file span {
+  color: #334155;
+  overflow-wrap: anywhere;
+}
+
+.pending-file button {
+  border: 0;
+  background: transparent;
+  color: var(--red);
+  white-space: nowrap;
+}
+
+.start-analysis-button {
+  margin-top: 16px;
+}
+
 .primary,
 .secondary {
   border: 0;
@@ -313,6 +368,15 @@ button {
 .secondary {
   background: var(--blue-soft);
   color: #275e9f;
+}
+
+.secondary.full-button {
+  width: 100%;
+}
+
+.secondary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .status-line {
@@ -380,6 +444,81 @@ button {
 .history-panel,
 .empty-state {
   margin-top: 22px;
+}
+
+.batch-panel {
+  margin-top: 22px;
+}
+
+.batch-table td:first-child,
+.batch-table th:first-child {
+  width: 72px;
+}
+
+.selected-row {
+  background: #f8fbff;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.status-badge.success {
+  color: #1f7a4d;
+  background: #ecfdf3;
+}
+
+.status-badge.error {
+  color: var(--red);
+  background: var(--red-soft);
+}
+
+.status-badge.info {
+  color: #275e9f;
+  background: var(--blue-soft);
+}
+
+.status-badge.neutral {
+  color: var(--muted);
+  background: #f1f5f9;
+}
+
+.danger-link {
+  color: var(--red);
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.export-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  gap: 22px;
+}
+
+.export-actions-panel {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.export-note {
+  margin: 0;
+  color: #42526b;
+  line-height: 1.7;
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 12px 14px;
 }
 
 .result-heading {

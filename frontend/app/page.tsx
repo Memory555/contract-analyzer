@@ -2,8 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  AlertTriangle,
-  BarChart3,
   ChevronLeft,
   ChevronRight,
   Download,
@@ -16,21 +14,33 @@ import {
   UploadCloud
 } from "lucide-react";
 import { extractDocxText, validateDocxFile } from "@/lib/docx";
-import { exportAnalysisExcel } from "@/lib/excel";
-import { cleanupExpiredRecords, clearLocalDatabase, listRecentRecords, saveAnalysisRecord } from "@/lib/local-db";
+import { exportAnalysisExcel, exportBatchAnalysisExcel } from "@/lib/excel";
+import {
+  bulkSaveContractAnalysisRecords,
+  cleanupExpiredRecords,
+  clearLocalDatabase,
+  listContractsByBatch,
+  listRecentBatches,
+  listRecentExports,
+  saveBatchAnalysisRecord,
+  saveContractAnalysisRecord,
+  saveExportHistoryRecord
+} from "@/lib/local-db";
 import { normalizeAnalysisResult } from "@/lib/normalize";
 import type {
-  AnalysisRecord,
   AnalysisResult,
   AnalyzeResponse,
+  BatchAnalysisRecord,
   ContractIssue,
+  ContractAnalysisRecord,
+  ExportHistoryRecord,
   PaymentPlanItem,
   WarrantyField
 } from "@/lib/types";
 
 type Status = "idle" | "uploading" | "analyzing" | "success" | "error";
 type SourceItem = ContractIssue | PaymentPlanItem | WarrantyField;
-type PageKey = "dashboard" | "analysis" | "review" | "exports" | "settings";
+type PageKey = "analysis" | "exports" | "settings";
 type LlmSettings = {
   openaiApiKey: string;
   openaiBaseUrl: string;
@@ -38,9 +48,7 @@ type LlmSettings = {
 };
 
 const navItems = [
-  { key: "dashboard" as const, label: "工作台", icon: BarChart3 },
   { key: "analysis" as const, label: "合同分析", icon: FileText },
-  { key: "review" as const, label: "问题审查", icon: AlertTriangle },
   { key: "exports" as const, label: "导出中心", icon: Download },
   { key: "settings" as const, label: "设置", icon: Settings }
 ];
@@ -53,21 +61,7 @@ const severityMap = {
 
 const SETTINGS_STORAGE_KEY = "contract-analyzer-demo-settings-v2";
 const LEGACY_SETTINGS_STORAGE_KEY = "contract-analyzer-demo-settings";
-
-const placeholderCopy: Record<Exclude<PageKey, "analysis" | "settings">, { title: string; body: string }> = {
-  dashboard: {
-    title: "工作台",
-    body: "占位符内容"
-  },
-  review: {
-    title: "问题审查",
-    body: "占位符内容"
-  },
-  exports: {
-    title: "导出中心",
-    body: "占位符内容"
-  }
-};
+const MAX_BATCH_FILES = 20;
 
 export default function Home() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -77,24 +71,57 @@ export default function Home() {
   const [fileName, setFileName] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [includeIssues, setIncludeIssues] = useState(true);
   const [sourceItem, setSourceItem] = useState<SourceItem | null>(null);
-  const [records, setRecords] = useState<AnalysisRecord[]>([]);
+  const [batches, setBatches] = useState<BatchAnalysisRecord[]>([]);
+  const [contracts, setContracts] = useState<ContractAnalysisRecord[]>([]);
+  const [exportRecords, setExportRecords] = useState<ExportHistoryRecord[]>([]);
+  const [activeBatchId, setActiveBatchId] = useState("");
+  const [currentContractId, setCurrentContractId] = useState("");
   const [llmSettings, setLlmSettings] = useState<LlmSettings>({
     openaiApiKey: "",
     openaiBaseUrl: "",
     openaiModel: ""
   });
 
+  const currentContract = useMemo(
+    () => contracts.find((contract) => contract.id === currentContractId) ?? null,
+    [contracts, currentContractId]
+  );
+
+  const currentResult = currentContract?.result ?? result;
+
+  const successfulContracts = useMemo(
+    () => contracts.filter((contract) => contract.status === "success" && contract.result),
+    [contracts]
+  );
+
+  const batchSummary = useMemo(() => {
+    const successCount = contracts.filter((contract) => contract.status === "success").length;
+    const failedCount = contracts.filter((contract) => contract.status === "failed").length;
+    const analyzingCount = contracts.filter((contract) => contract.status === "uploading" || contract.status === "analyzing").length;
+    const issueTotal = contracts.reduce((sum, contract) => sum + (contract.result?.issues.length ?? 0), 0);
+    return {
+      totalCount: contracts.length,
+      successCount,
+      failedCount,
+      analyzingCount,
+      issueTotal
+    };
+  }, [contracts]);
+
+  const canStartAnalysis = selectedFiles.length > 0 && status !== "uploading" && status !== "analyzing";
+
   const issueCounts = useMemo(() => {
-    const issues = result?.issues ?? [];
+    const issues = currentResult?.issues ?? [];
     return {
       error: issues.filter((item) => item.severity === "error").length,
       warning: issues.filter((item) => item.severity === "warning").length,
       info: issues.filter((item) => item.severity === "info").length
     };
-  }, [result]);
+  }, [currentResult]);
 
   useEffect(() => {
     void cleanupExpiredRecords(15).then(refreshRecords);
@@ -106,28 +133,101 @@ export default function Home() {
   }, []);
 
   async function refreshRecords() {
-    const recent = await listRecentRecords();
-    setRecords(recent);
+    setBatches(await listRecentBatches());
+    setExportRecords(await listRecentExports());
   }
 
-  async function analyzeFile(file: File) {
-    setError("");
-    setMessage("");
-    setResult(null);
+  async function openBatch(batchId: string) {
+    const batchContracts = await listContractsByBatch(batchId);
+    setContracts(batchContracts);
+    setActiveBatchId(batchId);
+    const firstSuccess = batchContracts.find((contract) => contract.status === "success" && contract.result);
+    setCurrentContractId(firstSuccess?.id ?? batchContracts[0]?.id ?? "");
+    setResult(firstSuccess?.result ?? null);
+    setFileName(firstSuccess?.fileName ?? "");
+    setStatus(firstSuccess ? "success" : batchContracts.length > 0 ? "error" : "idle");
+    setMessage(firstSuccess ? "已载入批量分析记录。" : "");
+    setError(firstSuccess ? "" : batchContracts.length > 0 ? "该批次暂无可查看的成功合同。" : "");
+    setActivePage("analysis");
+  }
 
-    const validationError = validateDocxFile(file);
-    if (validationError) {
-      setStatus("error");
-      setError(validationError);
-      return;
-    }
+  function updateContract(nextContract: ContractAnalysisRecord) {
+    setContracts((items) => items.map((item) => (item.id === nextContract.id ? nextContract : item)));
+  }
+
+  function addSelectedFiles(files: File[]) {
+    if (files.length === 0) return;
+    setError("");
+    setSelectedFiles((current) => {
+      const nextFiles = [...current, ...files].slice(0, MAX_BATCH_FILES);
+      if (current.length + files.length > MAX_BATCH_FILES) {
+        setMessage(`已加入前 ${MAX_BATCH_FILES} 份合同，超出部分未加入。`);
+      } else {
+        setMessage(`已加入 ${nextFiles.length} 份待分析合同，可继续添加或点击开始分析。`);
+      }
+      setStatus("idle");
+      setFileName(nextFiles.length === 1 ? nextFiles[0].name : `${nextFiles.length} 份待分析合同`);
+      return nextFiles;
+    });
+  }
+
+  function removeSelectedFile(index: number) {
+    setSelectedFiles((current) => {
+      const nextFiles = current.filter((_, fileIndex) => fileIndex !== index);
+      setFileName(nextFiles.length === 0 ? "" : nextFiles.length === 1 ? nextFiles[0].name : `${nextFiles.length} 份待分析合同`);
+      setMessage(nextFiles.length === 0 ? "待分析列表已清空。" : `待分析列表剩余 ${nextFiles.length} 份合同。`);
+      return nextFiles;
+    });
+  }
+
+  function createBatch(files: File[]) {
+    const now = new Date();
+    const stamp = now.toISOString().replace(/[-:T.Z]/g, "").slice(0, 14);
+    const batchId = `b_${stamp}`;
+    const createdAt = now.toISOString();
+    const nextContracts: ContractAnalysisRecord[] = files.map((file, index) => {
+      const uploadIndex = index + 1;
+      const displayName = file.name.replace(/\.(docx|doc|pdf)$/i, "") || `合同${uploadIndex}`;
+      const paddedIndex = String(uploadIndex).padStart(3, "0");
+      const validationError = validateDocxFile(file);
+      return {
+        id: `c_${stamp}_${paddedIndex}_${crypto.randomUUID().slice(0, 8)}`,
+        batchId,
+        uploadIndex,
+        fileName: file.name,
+        displayName,
+        exportName: `${paddedIndex}_${displayName}`,
+        fileSize: file.size,
+        status: validationError ? "failed" as const : "pending" as const,
+        createdAt,
+        updatedAt: createdAt,
+        errorMessage: validationError ?? undefined
+      };
+    });
+    const batch: BatchAnalysisRecord = {
+      batchId,
+      createdAt,
+      updatedAt: createdAt,
+      status: "pending",
+      totalCount: nextContracts.length,
+      successCount: 0,
+      failedCount: nextContracts.filter((contract) => contract.status === "failed").length,
+      contractIds: nextContracts.map((contract) => contract.id)
+    };
+    return { batch, nextContracts };
+  }
+
+  async function analyzeContract(file: File, contract: ContractAnalysisRecord) {
+    const uploadingContract = { ...contract, status: "uploading" as const, updatedAt: new Date().toISOString() };
+    updateContract(uploadingContract);
+    await saveContractAnalysisRecord(uploadingContract);
 
     try {
-      setFileName(file.name);
-      setStatus("uploading");
       const contractText = await extractDocxText(file);
+      const analyzingContract = { ...uploadingContract, status: "analyzing" as const, updatedAt: new Date().toISOString() };
+      updateContract(analyzingContract);
+      await saveContractAnalysisRecord(analyzingContract);
 
-      setStatus("analyzing");
       const pageApiKey = llmSettings.openaiApiKey.trim();
       const pageBaseUrl = llmSettings.openaiBaseUrl.trim();
       const pageModel = llmSettings.openaiModel.trim();
@@ -148,49 +248,140 @@ export default function Home() {
         throw new Error(data.message || "解析失败，请重试。");
       }
 
-      const analysis: AnalysisResult = normalizeAnalysisResult(data);
-
+      const analysis = normalizeAnalysisResult(data);
+      const successContract = {
+        ...analyzingContract,
+        status: "success" as const,
+        result: analysis,
+        errorMessage: undefined,
+        updatedAt: new Date().toISOString()
+      };
+      updateContract(successContract);
       setResult(analysis);
-      setMessage(data.message || (data.demo ? "当前为演示数据。" : "解析完成。"));
+      setFileName(file.name);
       setStatus("success");
-
-      await saveAnalysisRecord({
-        id: crypto.randomUUID(),
-        fileName: file.name,
-        createdAt: new Date().toISOString(),
-        result: analysis
-      });
-      await refreshRecords();
+      setMessage(data.message || (data.demo ? "当前为演示数据。" : "解析完成。"));
+      await saveContractAnalysisRecord(successContract);
+      return successContract;
     } catch (nextError) {
-      setStatus("error");
-      setError(nextError instanceof Error ? nextError.message : "解析失败，请重试。");
+      const failedContract = {
+        ...contract,
+        status: "failed" as const,
+        updatedAt: new Date().toISOString(),
+        errorMessage: nextError instanceof Error ? nextError.message : "解析失败，请重试。"
+      };
+      updateContract(failedContract);
+      await saveContractAnalysisRecord(failedContract);
+      return failedContract;
     }
+  }
+
+  async function analyzeFiles(fileList: File[]) {
+    setError("");
+    setMessage("");
+    setResult(null);
+
+    const files = fileList.slice(0, MAX_BATCH_FILES);
+    if (files.length === 0) {
+      setStatus("error");
+      setError("请选择 DOCX 合同文件。");
+      return;
+    }
+
+    const { batch, nextContracts } = createBatch(files);
+    setActiveBatchId(batch.batchId);
+    setContracts(nextContracts);
+    setCurrentContractId(nextContracts[0]?.id ?? "");
+    setFileName(files.length === 1 ? files[0].name : `${files.length} 份合同`);
+    setStatus("analyzing");
+    setMessage("已创建批量分析任务。");
+    await saveBatchAnalysisRecord(batch);
+    await bulkSaveContractAnalysisRecords(nextContracts);
+
+    const latestContracts = [...nextContracts];
+    for (const contract of nextContracts) {
+      if (contract.status === "failed") continue;
+      const file = files[contract.uploadIndex - 1];
+      const analyzed = await analyzeContract(file, contract);
+      latestContracts[contract.uploadIndex - 1] = analyzed;
+      if (!currentContractId && analyzed.status === "success") {
+        setCurrentContractId(analyzed.id);
+      }
+    }
+
+    const successCount = latestContracts.filter((contract) => contract.status === "success").length;
+    const failedCount = latestContracts.filter((contract) => contract.status === "failed").length;
+    const finalBatch: BatchAnalysisRecord = {
+      ...batch,
+      updatedAt: new Date().toISOString(),
+      status: successCount === latestContracts.length
+        ? "success"
+        : successCount > 0
+          ? "partial_success"
+          : "failed",
+      successCount,
+      failedCount
+    };
+    setContracts(latestContracts);
+    const firstSuccess = latestContracts.find((contract) => contract.status === "success" && contract.result);
+    if (firstSuccess) {
+      setCurrentContractId(firstSuccess.id);
+      setResult(firstSuccess.result ?? null);
+      setFileName(firstSuccess.fileName);
+    }
+    setStatus(successCount > 0 ? "success" : "error");
+    setError(successCount > 0 ? "" : "本批次合同均未解析成功，请检查文件或模型配置。");
+    setMessage(`批量分析完成：${successCount} 份成功，${failedCount} 份失败。`);
+    await saveBatchAnalysisRecord(finalBatch);
+    await refreshRecords();
+    setSelectedFiles([]);
   }
 
   function handleDrop(event: React.DragEvent<HTMLDivElement>) {
     event.preventDefault();
-    const file = event.dataTransfer.files[0];
-    if (file) void analyzeFile(file);
+    addSelectedFiles(Array.from(event.dataTransfer.files));
   }
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (file) void analyzeFile(file);
+    const files = Array.from(event.target.files ?? []);
+    if (files.length > 0) addSelectedFiles(files);
     event.target.value = "";
   }
 
-  async function handleExport() {
-    if (!result || !fileName) return;
-    await exportAnalysisExcel(fileName, result, includeIssues);
+  function handleStartAnalysis() {
+    void analyzeFiles(selectedFiles);
   }
 
-  function loadRecord(record: AnalysisRecord) {
-    setResult(record.result);
-    setFileName(record.fileName);
-    setStatus("success");
-    setMessage("已载入浏览器本地历史记录。");
+  async function handleContractExport(contract: ContractAnalysisRecord) {
+    if (!contract.result) return;
+    await exportAnalysisExcel(contract.fileName, contract.result, includeIssues, contract.exportName);
+    await saveExportHistoryRecord({
+      id: crypto.randomUUID(),
+      batchId: contract.batchId,
+      contractId: contract.id,
+      fileName: `合同分析结果_${contract.exportName}.xlsx`,
+      mode: "single",
+      createdAt: new Date().toISOString()
+    });
+    await refreshRecords();
+  }
+
+  async function handleBatchExport() {
+    if (!activeBatchId || successfulContracts.length === 0) return;
+    await exportBatchAnalysisExcel(activeBatchId, contracts, includeIssues);
+    await saveExportHistoryRecord({
+      id: crypto.randomUUID(),
+      batchId: activeBatchId,
+      fileName: `合同批量分析结果_${activeBatchId}.xlsx`,
+      mode: "batch",
+      createdAt: new Date().toISOString()
+    });
+    await refreshRecords();
+  }
+
+  async function retryContract(contract: ContractAnalysisRecord) {
     setError("");
-    setActivePage("analysis");
+    setMessage(`请重新选择 ${contract.fileName} 后再次分析。`);
   }
 
   function saveSettings(nextSettings: LlmSettings) {
@@ -251,7 +442,11 @@ export default function Home() {
             <header className="topbar">
               <div>
                 <p>合同分析</p>
-                <h1>上传 DOCX 合同并生成结构化分析结果</h1>
+                <h1>上传一批 DOCX 合同并生成结构化分析结果</h1>
+              </div>
+              <div className="badges">
+                <span>v2 批量分析</span>
+                <span>支持汇总导出</span>
               </div>
             </header>
 
@@ -260,10 +455,10 @@ export default function Home() {
                 <div className="panel-title">
                   <div>
                     <h2>上传合同</h2>
-                    <p>支持 DOCX，单文件不超过 20MB。</p>
+                    <p>支持 DOCX，多选或拖拽上传，单文件不超过 20MB。</p>
                   </div>
                   <button className="secondary" type="button" onClick={() => fileInputRef.current?.click()}>
-                    选择文件
+                    选择合同
                   </button>
                 </div>
 
@@ -276,26 +471,49 @@ export default function Home() {
                   tabIndex={0}
                 >
                   <UploadCloud size={42} />
-                  <strong>点击或拖拽上传 DOCX 合同</strong>
-                  <span>上传后自动提取付款计划、质保明细与合同问题</span>
-                  <input ref={fileInputRef} type="file" accept=".docx" onChange={handleFileChange} hidden />
+                  <strong>点击或拖拽添加 DOCX 合同</strong>
+                  <span>可分多次添加，点击开始分析后统一生成批次</span>
+                  <input ref={fileInputRef} type="file" accept=".docx" multiple onChange={handleFileChange} hidden />
                 </div>
+
+                {selectedFiles.length > 0 ? (
+                  <div className="pending-files">
+                    <div className="pending-files-title">
+                      <strong>待分析合同</strong>
+                      <span>{selectedFiles.length} / {MAX_BATCH_FILES} 份</span>
+                    </div>
+                    <div className="pending-file-list">
+                      {selectedFiles.map((file, index) => (
+                        <div className="pending-file" key={`${file.name}-${file.size}-${file.lastModified}-${index}`}>
+                          <span>{String(index + 1).padStart(3, "0")} · {file.name}</span>
+                          <button type="button" onClick={() => removeSelectedFile(index)}>移除</button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                <button className="primary start-analysis-button" type="button" disabled={!canStartAnalysis} onClick={handleStartAnalysis}>
+                  <Loader2 size={18} className={status === "analyzing" || status === "uploading" ? "spin" : undefined} />
+                  开始分析
+                </button>
 
                 <StatusLine status={status} fileName={fileName} error={error} message={message} />
               </div>
 
               <div className="panel summary-panel">
-                <h2>任务摘要</h2>
+                <h2>批量摘要</h2>
                 <SummaryRow label="解析状态" value={statusLabel(status)} />
-                <SummaryRow label="合同文件" value={fileName || "待上传"} />
+                <SummaryRow label="当前批次" value={activeBatchId || "待创建"} />
                 <SummaryRow
-                  label="问题数量"
-                  value={result ? `${result.issues.length} 个` : "待解析"}
-                  accent={result ? "warning" : undefined}
+                  label="合同数量"
+                  value={batchSummary.totalCount ? `${batchSummary.totalCount} 份` : selectedFiles.length ? `${selectedFiles.length} 份待分析` : "待上传"}
                 />
+                <SummaryRow label="成功 / 失败" value={`${batchSummary.successCount} / ${batchSummary.failedCount}`} />
                 <SummaryRow
-                  label="整体置信度"
-                  value={result ? `${Math.round(result.confidence.overall * 100)}%` : "待解析"}
+                  label="问题总数"
+                  value={batchSummary.totalCount ? `${batchSummary.issueTotal} 个` : "待解析"}
+                  accent={batchSummary.issueTotal ? "warning" : undefined}
                 />
                 <label className="checkbox-row">
                   <input
@@ -305,29 +523,53 @@ export default function Home() {
                   />
                   包含合同问题 Sheet
                 </label>
-                <button className="primary" type="button" disabled={!result} onClick={() => void handleExport()}>
+                <button className="secondary full-button" type="button" disabled={successfulContracts.length === 0} onClick={() => void handleBatchExport()}>
                   <Download size={18} />
-                  下载 Excel
+                  导出批量汇总
                 </button>
               </div>
             </section>
 
-            {result ? (
+            {contracts.length > 0 ? (
+              <BatchWorkspace
+                contracts={contracts}
+                currentContractId={currentContractId}
+                onSelectContract={(contract) => {
+                  setCurrentContractId(contract.id);
+                  setResult(contract.result ?? null);
+                  setFileName(contract.fileName);
+                }}
+                onRetryContract={(contract) => void retryContract(contract)}
+                onExportContract={(contract) => void handleContractExport(contract)}
+              />
+            ) : null}
+
+            {currentResult ? (
               <AnalysisResultView
-                result={result}
+                result={currentResult}
                 issueCounts={issueCounts}
+                currentContract={currentContract}
                 onOpenSource={setSourceItem}
               />
             ) : (
               <section className="empty-state">
                 <FileText size={40} />
                 <h2>等待上传合同</h2>
-                <p>上传 DOCX 后，这里会展示合同问题、付款计划、质保明细和 Excel 下载入口。</p>
+                <p>上传 DOCX 后，这里会展示批量任务、单合同详情和 Excel 导出入口。</p>
               </section>
             )}
 
-            <HistoryPanel records={records} onLoadRecord={loadRecord} />
+            <BatchHistoryPanel batches={batches} onOpenBatch={(batchId) => void openBatch(batchId)} />
           </>
+        ) : activePage === "exports" ? (
+          <ExportCenterPage
+            batches={batches}
+            contracts={contracts}
+            exportRecords={exportRecords}
+            activeBatchId={activeBatchId}
+            onOpenBatch={openBatch}
+            onBatchExport={() => void handleBatchExport()}
+          />
         ) : activePage === "settings" ? (
           <SettingsPage
             settings={llmSettings}
@@ -336,7 +578,12 @@ export default function Home() {
               await clearLocalDatabase();
               window.localStorage.clear();
               window.sessionStorage.clear();
-              setRecords([]);
+              setBatches([]);
+              setContracts([]);
+              setExportRecords([]);
+              setActiveBatchId("");
+              setCurrentContractId("");
+              setSelectedFiles([]);
               setResult(null);
               setFileName("");
               setError("");
@@ -345,9 +592,7 @@ export default function Home() {
               setLlmSettings({ openaiApiKey: "", openaiBaseUrl: "", openaiModel: "" });
             }}
           />
-        ) : (
-          <PlaceholderPage page={activePage} />
-        )}
+        ) : null}
       </section>
 
       {sourceItem ? <SourceDrawer item={sourceItem} onClose={() => setSourceItem(null)} /> : null}
@@ -355,21 +600,117 @@ export default function Home() {
   );
 }
 
+function BatchWorkspace({
+  contracts,
+  currentContractId,
+  onSelectContract,
+  onRetryContract,
+  onExportContract
+}: {
+  contracts: ContractAnalysisRecord[];
+  currentContractId: string;
+  onSelectContract: (contract: ContractAnalysisRecord) => void;
+  onRetryContract: (contract: ContractAnalysisRecord) => void;
+  onExportContract: (contract: ContractAnalysisRecord) => void;
+}) {
+  return (
+    <section className="panel batch-panel">
+      <div className="panel-title compact">
+        <h2>批量任务列表</h2>
+        <span className="muted">同名合同通过上传序号和合同ID区分</span>
+      </div>
+      <div className="table-wrap">
+        <table className="batch-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>合同名称</th>
+              <th>原始文件名</th>
+              <th>状态</th>
+              <th>问题</th>
+              <th>付款</th>
+              <th>质保</th>
+              <th>置信度</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {contracts.map((contract) => {
+              const warrantyCount =
+                (contract.result?.warranty.core_fields.length ?? 0) + (contract.result?.warranty.extra_fields.length ?? 0);
+              return (
+                <tr key={contract.id} className={contract.id === currentContractId ? "selected-row" : undefined}>
+                  <td>{String(contract.uploadIndex).padStart(3, "0")}</td>
+                  <td>
+                    <strong>{contract.displayName}</strong>
+                    <span>{contract.id}</span>
+                  </td>
+                  <td>{contract.fileName}</td>
+                  <td><StatusBadge status={contract.status} /></td>
+                  <td>{contract.result?.issues.length ?? "-"}</td>
+                  <td>{contract.result?.payment_plan.length ?? "-"}</td>
+                  <td>{contract.result ? warrantyCount : "-"}</td>
+                  <td>{contract.result ? `${Math.round(contract.result.confidence.overall * 100)}%` : "-"}</td>
+                  <td>
+                    {contract.status === "failed" ? (
+                      <button className="link-button danger-link" type="button" onClick={() => onRetryContract(contract)}>
+                        重试
+                      </button>
+                    ) : (
+                      <div className="row-actions">
+                        <button className="link-button" type="button" onClick={() => onSelectContract(contract)} disabled={!contract.result}>
+                          查看详情
+                        </button>
+                        <button className="link-button" type="button" onClick={() => onExportContract(contract)} disabled={!contract.result}>
+                          导出合同
+                        </button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function StatusBadge({ status }: { status: ContractAnalysisRecord["status"] }) {
+  const labels: Record<ContractAnalysisRecord["status"], string> = {
+    pending: "等待",
+    uploading: "提取中",
+    analyzing: "分析中",
+    success: "完成",
+    failed: "失败",
+    cancelled: "取消"
+  };
+  const tone = status === "success" ? "success" : status === "failed" ? "error" : status === "pending" ? "neutral" : "info";
+  return <span className={`status-badge ${tone}`}>{labels[status]}</span>;
+}
+
 function AnalysisResultView({
   result,
   issueCounts,
+  currentContract,
   onOpenSource
 }: {
   result: AnalysisResult;
   issueCounts: { error: number; warning: number; info: number };
+  currentContract: ContractAnalysisRecord | null;
   onOpenSource: (item: SourceItem) => void;
 }) {
   return (
     <section className="results">
       <div className="result-heading">
         <div>
-          <h2>分析结果</h2>
-          <p>优先查看问题提示，再核对结构化明细。置信度不代表法律结论。</p>
+          <h2>{currentContract ? `${currentContract.exportName} 分析结果` : "分析结果"}</h2>
+          <p>
+            {currentContract
+              ? `批次：${currentContract.batchId}，原始文件名：${currentContract.fileName}`
+              : "优先查看问题提示，再核对结构化明细。置信度不代表法律结论。"}
+          </p>
         </div>
         <div className="confidence">
           <span>付款 {Math.round(result.confidence.payment_plan * 100)}%</span>
@@ -650,52 +991,140 @@ function SettingsPage({
   );
 }
 
-function PlaceholderPage({ page }: { page: Exclude<PageKey, "analysis" | "settings"> }) {
-  const copy = placeholderCopy[page];
+function ExportCenterPage({
+  batches,
+  contracts,
+  exportRecords,
+  activeBatchId,
+  onOpenBatch,
+  onBatchExport
+}: {
+  batches: BatchAnalysisRecord[];
+  contracts: ContractAnalysisRecord[];
+  exportRecords: ExportHistoryRecord[];
+  activeBatchId: string;
+  onOpenBatch: (batchId: string) => Promise<void>;
+  onBatchExport: () => void;
+}) {
+  const activeSuccessCount = contracts.filter((contract) => contract.status === "success" && contract.result).length;
   return (
     <>
       <header className="topbar">
         <div>
-          <p>{copy.title} / 待开发</p>
-          <h1>{copy.title}</h1>
+          <p>导出中心 / 批量结果</p>
+          <h1>导出中心</h1>
         </div>
         <div className="badges">
-          <span>预留模块</span>
+          <span>单合同导出</span>
+          <span>批量汇总 Excel</span>
         </div>
       </header>
-      <section className="panel placeholder-panel">
-        <FileCheck2 size={42} />
-        <h2>该模块待进一步开发</h2>
-        <p>{copy.body}</p>
+
+      <section className="export-grid">
+        <article className="panel">
+          <div className="panel-title compact">
+            <h2>最近批量任务</h2>
+            <span className="muted">仅保存在当前浏览器</span>
+          </div>
+          {batches.length === 0 ? (
+            <p className="empty">暂无批量任务。</p>
+          ) : (
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>批次ID</th>
+                    <th>合同数</th>
+                    <th>成功 / 失败</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {batches.map((batch) => (
+                    <tr key={batch.batchId}>
+                      <td>{batch.batchId}</td>
+                      <td>{batch.totalCount}</td>
+                      <td>{batch.successCount} / {batch.failedCount}</td>
+                      <td>{batchStatusLabel(batch.status)}</td>
+                      <td>
+                        <button className="link-button" type="button" onClick={() => void onOpenBatch(batch.batchId)}>
+                          打开批次
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </article>
+
+        <article className="panel export-actions-panel">
+          <div className="panel-title compact">
+            <h2>当前批次导出</h2>
+            <span className="muted">{activeBatchId || "未选择批次"}</span>
+          </div>
+          <p className="export-note">
+            批量汇总 Excel 会把本批次合同集中到同一个文件，并在每一行写入批次ID、上传序号、合同ID、合同名称和原始文件名。
+          </p>
+          <SummaryRow label="可汇总合同" value={`${activeSuccessCount} 份`} />
+          <SummaryRow label="当前任务数" value={`${contracts.length} 份`} />
+          <button className="primary" type="button" disabled={activeSuccessCount === 0} onClick={onBatchExport}>
+            <Download size={18} />
+            导出全部合同汇总表
+          </button>
+        </article>
+      </section>
+
+      <section className="panel history-panel">
+        <div className="panel-title compact">
+          <h2>导出记录</h2>
+          <span className="muted">记录最近导出的文件名</span>
+        </div>
+        {exportRecords.length === 0 ? (
+          <p className="empty">暂无导出记录。</p>
+        ) : (
+          <div className="record-list">
+            {exportRecords.map((record) => (
+              <button key={record.id} type="button">
+                <strong>{record.fileName}</strong>
+                <span>{record.mode === "batch" ? "批量汇总" : "单合同"} · {new Date(record.createdAt).toLocaleString("zh-CN")}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </section>
     </>
   );
 }
 
-function HistoryPanel({
-  records,
-  onLoadRecord
+function BatchHistoryPanel({
+  batches,
+  onOpenBatch
 }: {
-  records: AnalysisRecord[];
-  onLoadRecord: (record: AnalysisRecord) => void;
+  batches: BatchAnalysisRecord[];
+  onOpenBatch: (batchId: string) => void;
 }) {
   return (
     <section className="panel history-panel">
       <div className="panel-title compact">
         <h2>
           <History size={18} />
-          最近分析记录
+          最近批量任务
         </h2>
         <span className="muted">仅保存在当前浏览器</span>
       </div>
-      {records.length === 0 ? (
-        <p className="empty">暂无本地记录。</p>
+      {batches.length === 0 ? (
+        <p className="empty">暂无批量任务。</p>
       ) : (
         <div className="record-list">
-          {records.map((record) => (
-            <button key={record.id} type="button" onClick={() => onLoadRecord(record)}>
-              <strong>{record.fileName}</strong>
-              <span>{new Date(record.createdAt).toLocaleString("zh-CN")}</span>
+          {batches.map((batch) => (
+            <button key={batch.batchId} type="button" onClick={() => onOpenBatch(batch.batchId)}>
+              <strong>{batch.batchId}</strong>
+              <span>
+                {batch.totalCount} 份合同 · {batch.successCount} 成功 / {batch.failedCount} 失败 · {new Date(batch.createdAt).toLocaleString("zh-CN")}
+              </span>
             </button>
           ))}
         </div>
@@ -715,6 +1144,18 @@ function statusLabel(status: Status) {
   return labels[status];
 }
 
+function batchStatusLabel(status: BatchAnalysisRecord["status"]) {
+  const labels: Record<BatchAnalysisRecord["status"], string> = {
+    pending: "等待分析",
+    analyzing: "正在分析",
+    partial_success: "部分成功",
+    success: "全部完成",
+    failed: "全部失败",
+    cancelled: "已取消"
+  };
+  return labels[status];
+}
+
 function StatusLine({
   status,
   fileName,
@@ -726,7 +1167,7 @@ function StatusLine({
   error: string;
   message: string;
 }) {
-  if (status === "idle") return <p className="status-line">请选择 DOCX 合同文件开始分析。</p>;
+  if (status === "idle") return <p className="status-line">{message || "请选择 DOCX 合同文件加入待分析列表。"}</p>;
   if (status === "uploading" || status === "analyzing") {
     return (
       <p className="status-line active">

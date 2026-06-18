@@ -54,6 +54,47 @@ export type AnalysisRecord = {
   result: AnalysisResult;
 };
 
+export type ContractAnalysisStatus = "pending" | "uploading" | "analyzing" | "success" | "failed" | "cancelled";
+
+export type BatchAnalysisStatus = "pending" | "analyzing" | "partial_success" | "success" | "failed" | "cancelled";
+
+export type ContractAnalysisRecord = {
+  id: string;
+  batchId: string;
+  uploadIndex: number;
+  fileName: string;
+  displayName: string;
+  exportName: string;
+  fileSize: number;
+  status: ContractAnalysisStatus;
+  createdAt: string;
+  updatedAt: string;
+  result?: AnalysisResult;
+  errorMessage?: string;
+};
+
+export type BatchAnalysisRecord = {
+  batchId: string;
+  createdAt: string;
+  updatedAt: string;
+  status: BatchAnalysisStatus;
+  totalCount: number;
+  successCount: number;
+  failedCount: number;
+  contractIds: string[];
+};
+
+export type ExportMode = "single" | "batch";
+
+export type ExportHistoryRecord = {
+  id: string;
+  batchId: string;
+  contractId?: string;
+  fileName: string;
+  mode: ExportMode;
+  createdAt: string;
+};
+
 export type AnalyzeRequest = {
   fileName: string;
   contractText: string;
