@@ -67,3 +67,5 @@ desktop.ini
 *.swo
 .idea/
 .vscode/
+.workbuddy/
+.claude/
