@@ -1807,3 +1807,836 @@ mark {
     max-width: 100%;
   }
 }
+
+/* =========================================
+   Feedback management
+   ========================================= */
+
+.feedback-grid {
+  display: grid;
+  grid-template-columns: 390px minmax(0, 1fr);
+  gap: 22px;
+}
+
+.feedback-refresh {
+  width: auto;
+  min-width: 120px;
+}
+
+.feedback-history-panel,
+.feedback-detail-panel {
+  min-height: 640px;
+}
+
+.feedback-contract-list {
+  display: grid;
+  gap: 10px;
+}
+
+.feedback-contract {
+  border: 1px solid var(--line);
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 14px;
+  text-align: left;
+  display: grid;
+  gap: 6px;
+  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.feedback-contract:hover {
+  background: #eef6ff;
+  border-color: #b9d4f3;
+  box-shadow: var(--shadow-sm);
+}
+
+.feedback-contract.active {
+  background: var(--blue-soft);
+  border-color: #7aa7d9;
+}
+
+.feedback-contract strong {
+  color: var(--text);
+}
+
+.feedback-contract span,
+.feedback-contract small {
+  color: var(--muted);
+}
+
+.feedback-empty {
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.feedback-empty h2,
+.feedback-empty p {
+  margin: 0;
+}
+
+.feedback-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.feedback-summary div {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.feedback-summary span {
+  color: var(--muted);
+}
+
+.feedback-summary strong {
+  font-size: 26px;
+  color: var(--text);
+}
+
+.feedback-summary-text {
+  margin: 0 0 18px;
+  color: #42526b;
+  line-height: 1.7;
+}
+
+.feedback-alert {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--orange);
+  background: var(--orange-soft);
+  margin-bottom: 16px;
+}
+
+.feedback-status {
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 13px;
+  color: #275e9f;
+  background: var(--blue-soft);
+}
+
+.feedback-status.failed {
+  color: var(--red);
+  background: var(--red-soft);
+}
+
+.feedback-flow {
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 18px;
+  background: #ffffff;
+  display: grid;
+  gap: 16px;
+}
+
+.feedback-flow.success {
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  border-color: #bbf7d0;
+  background: var(--green-soft);
+}
+
+.feedback-flow.success p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.feedback-step-caption {
+  display: grid;
+  gap: 4px;
+}
+
+.feedback-step-caption span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.feedback-step-caption strong {
+  font-size: 20px;
+}
+
+.feedback-actions,
+.feedback-footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.feedback-helpful,
+.feedback-problem {
+  border: 0;
+  border-radius: 999px;
+  min-width: 122px;
+  min-height: 42px;
+  padding: 0 18px;
+  font-weight: 700;
+}
+
+.feedback-helpful {
+  color: #ffffff;
+  background: var(--green);
+}
+
+.feedback-problem {
+  color: #a94725;
+  background: var(--orange-soft);
+  border: 1px solid #f0c4a5;
+}
+
+.feedback-reasons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.feedback-reason {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 14px;
+  text-align: left;
+  display: grid;
+  gap: 6px;
+}
+
+.feedback-reason.active {
+  border-color: #f0c4a5;
+  background: var(--orange-soft);
+}
+
+.feedback-reason span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.feedback-comment {
+  display: grid;
+  gap: 8px;
+  color: #334155;
+  font-weight: 700;
+}
+
+.feedback-comment textarea {
+  min-height: 110px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--text);
+  background: #fbfdff;
+}
+
+.feedback-auto-context {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.feedback-auto-context span {
+  color: var(--muted);
+}
+
+.inline-primary {
+  width: auto;
+}
+
+.feedback-message {
+  margin: 0;
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.feedback-message.success {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.feedback-message.error {
+  color: var(--red);
+  background: var(--red-soft);
+}
+
+@media (max-width: 1060px) {
+  .feedback-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .feedback-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .feedback-flow.success {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================
+   Feedback tabs
+   ========================================= */
+
+.feedback-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--line);
+  padding-bottom: 0;
+}
+
+.feedback-tab {
+  border: 0;
+  background: transparent;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+  cursor: pointer;
+}
+
+.feedback-tab:hover {
+  color: var(--text);
+}
+
+.feedback-tab.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+}
+
+/* =========================================
+   Cloud feedback dashboard
+   ========================================= */
+
+.cloud-feedback-dashboard {
+  display: grid;
+  gap: 20px;
+}
+
+/* ---- 统计卡片 ---- */
+
+.cloud-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.cloud-stat-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.cloud-stat-card svg {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.cloud-stat-card > div {
+  display: grid;
+  gap: 2px;
+}
+
+.cloud-stat-card span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.cloud-stat-card strong {
+  font-size: 28px;
+  color: var(--text);
+}
+
+.cloud-stat-card small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cloud-stat-card.total svg {
+  color: var(--blue);
+  background: var(--blue-soft);
+}
+
+.cloud-stat-card.helpful svg {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.cloud-stat-card.problem svg {
+  color: var(--red);
+  background: var(--red-soft);
+}
+
+/* ---- 问题分类分布 ---- */
+
+.cloud-category-bars {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.cloud-category-bars h3 {
+  margin: 0 0 14px;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.cloud-category-list {
+  display: grid;
+  gap: 10px;
+}
+
+.cloud-category-bar {
+  display: grid;
+  grid-template-columns: 120px 1fr 40px;
+  align-items: center;
+  gap: 12px;
+}
+
+.cloud-category-label {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.cloud-category-track {
+  height: 10px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.cloud-category-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+  min-width: 2px;
+}
+
+.cloud-category-count {
+  text-align: right;
+  font-weight: 700;
+  color: var(--text);
+  font-size: 15px;
+}
+
+/* ---- 筛选栏 ---- */
+
+.cloud-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.cloud-filter-group {
+  display: flex;
+  gap: 4px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.cloud-filter-chip {
+  border: 0;
+  background: transparent;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.cloud-filter-chip:hover {
+  color: var(--text);
+}
+
+.cloud-filter-chip.active {
+  background: var(--blue);
+  color: #ffffff;
+}
+
+.cloud-filter-chip.active.helpful {
+  background: var(--green);
+}
+
+.cloud-filter-chip.active.problem {
+  background: var(--red);
+}
+
+.cloud-filter-select {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--panel);
+  cursor: pointer;
+}
+
+.cloud-refresh-btn {
+  width: auto;
+  min-width: 100px;
+  margin-left: auto;
+}
+
+/* ---- 错误提示 ---- */
+
+.cloud-feedback-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 10px;
+  background: var(--red-soft);
+  color: var(--red);
+  border: 1px solid #f5c6c0;
+}
+
+.cloud-feedback-error strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.cloud-feedback-error p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.cloud-feedback-error button {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ---- 空状态 ---- */
+
+.cloud-feedback-empty {
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  text-align: center;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.cloud-feedback-empty h2,
+.cloud-feedback-empty p {
+  margin: 0;
+}
+
+/* ---- 反馈列表 ---- */
+
+.cloud-feedback-list {
+  display: grid;
+  gap: 10px;
+}
+
+.cloud-feedback-row {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.cloud-feedback-row:hover {
+  border-color: #b9d4f3;
+  box-shadow: var(--shadow-sm);
+}
+
+.cloud-feedback-row.expanded {
+  border-color: var(--blue);
+  box-shadow: var(--shadow-md);
+}
+
+.cloud-feedback-row-header {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.cloud-feedback-row-header:hover {
+  background: #f8fafc;
+}
+
+.cloud-feedback-expand-icon {
+  flex-shrink: 0;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+}
+
+.cloud-feedback-type-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.cloud-feedback-type-badge.helpful {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.cloud-feedback-type-badge.problem {
+  color: var(--red);
+  background: var(--red-soft);
+}
+
+.cloud-feedback-filename {
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1;
+}
+
+.cloud-feedback-category-tag {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--orange);
+  background: var(--orange-soft);
+}
+
+.cloud-feedback-meta {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.cloud-feedback-comment-preview {
+  margin: 0;
+  padding: 0 16px 12px 42px;
+  color: var(--muted);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- 展开详情 ---- */
+
+.cloud-feedback-detail {
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--line);
+  margin-top: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.cloud-feedback-detail-loading {
+  padding: 14px 0;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cloud-feedback-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  padding-top: 14px;
+}
+
+.cloud-feedback-detail-grid > div {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 4px;
+}
+
+.cloud-feedback-detail-grid span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cloud-feedback-detail-grid strong {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.cloud-feedback-comment {
+  background: var(--orange-soft);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.cloud-feedback-comment strong {
+  color: var(--orange);
+  font-size: 13px;
+}
+
+.cloud-feedback-comment p {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.cloud-feedback-summary-box {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.cloud-feedback-summary-box strong {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.cloud-feedback-summary-box p {
+  margin: 0;
+  color: #42526b;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.cloud-feedback-contract {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0;
+}
+
+.cloud-feedback-contract summary {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  user-select: none;
+}
+
+.cloud-feedback-contract summary::-webkit-details-marker {
+  display: none;
+}
+
+.cloud-feedback-contract pre {
+  margin: 0;
+  padding: 14px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: #1e293b;
+  color: #e2e8f0;
+  border-radius: 0 0 8px 8px;
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ---- 分页 ---- */
+
+.cloud-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 4px;
+}
+
+.cloud-page-info {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ---- 响应式 ---- */
+
+@media (max-width: 1060px) {
+  .cloud-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cloud-category-bar {
+    grid-template-columns: 100px 1fr 36px;
+  }
+}
+
+@media (max-width: 720px) {
+  .cloud-feedback-row-header {
+    flex-wrap: wrap;
+  }
+
+  .cloud-feedback-filename {
+    flex-basis: 100%;
+    order: 5;
+  }
+
+  .cloud-feedback-meta {
+    flex-basis: 100%;
+    order: 6;
+    font-size: 11px;
+  }
+
+  .cloud-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cloud-refresh-btn {
+    margin-left: 0;
+  }
+}

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="960" viewBox="0 0 1440 960">
+  <rect width="1440" height="960" fill="#f4f7fb"/>
+  <style>.font{font-family:"Microsoft YaHei",Arial,sans-serif}.title{font-size:26px;font-weight:700;fill:#172033}.h2{font-size:20px;font-weight:700;fill:#172033}.body{font-size:15px;fill:#475569}.muted{font-size:13px;fill:#7b8798}.panel{fill:#fff;stroke:#d9e1ec;stroke-width:2}.active{fill:#eef6ff;stroke:#7aa7d9;stroke-width:2}.btn{fill:#2563eb}.ok{fill:#16a34a}.warn{fill:#fff7ed;stroke:#fdba74;stroke-width:1.5}.chip{fill:#fff;stroke:#cbd5e1;stroke-width:1.5}.chipActive{fill:#fff7ed;stroke:#fdba74;stroke-width:2}.auto{fill:#f0fdf4;stroke:#bbf7d0;stroke-width:1.5}</style>
+  <rect x="0" y="0" width="244" height="960" fill="#102033"/>
+  <text x="44" y="180" class="font" font-size="16" fill="#b8c7da">合同分析</text>
+  <text x="44" y="232" class="font" font-size="16" fill="#b8c7da">导出中心</text>
+  <text x="44" y="284" class="font" font-size="16" fill="#b8c7da">反馈管理</text>
+  <text x="44" y="336" class="font" font-size="16" fill="#b8c7da">设置</text>
+  <rect x="244" y="0" width="1196" height="84" fill="#fff"/>
+  <text x="284" y="36" class="font muted">原型 1 / 合同分析页</text>
+  <text x="284" y="66" class="font title">合同分析页保持原设计，仅左侧新增“反馈管理”入口</text>
+  
+  <rect x="16" y="150" width="212" height="48" rx="8" fill="#223a56"/><rect x="16" y="150" width="4" height="48" rx="2" fill="#4aa3ff"/><text x="44" y="180" class="font" font-size="16" font-weight="700" fill="#fff">合同分析</text>
+  <rect x="284" y="128" width="484" height="190" rx="8" class="panel"/><text x="316" y="166" class="font h2">上传合同</text><rect x="316" y="190" width="420" height="86" rx="8" fill="#f8fbff" stroke="#7aa7d9" stroke-width="3" stroke-dasharray="10 8"/><text x="526" y="238" text-anchor="middle" class="font" font-size="20" font-weight="700" fill="#275e9f">点击或拖拽上传合同</text>
+  <rect x="792" y="128" width="568" height="190" rx="8" class="panel"/><text x="824" y="166" class="font h2">批量概览</text><text x="824" y="210" class="font body">合同总数、完成数、失败数保持现有布局。</text>
+  <rect x="284" y="350" width="1076" height="478" rx="8" class="panel"/><text x="316" y="390" class="font h2">合同分析结果</text><text x="316" y="454" class="font body">付款计划、质保明细、合同问题、导出能力均保持现有布局。</text><text x="316" y="488" class="font body">v3 不在此页面强行增加反馈表单，避免干扰用户完成分析工作。</text>
+  <rect x="316" y="540" width="300" height="160" rx="8" fill="#f8fafc"/><text x="340" y="576" class="font h2">付款计划</text><rect x="640" y="540" width="300" height="160" rx="8" fill="#f8fafc"/><text x="664" y="576" class="font h2">质保明细</text><rect x="964" y="540" width="300" height="160" rx="8" fill="#f8fafc"/><text x="988" y="576" class="font h2">合同问题</text>
+  <text x="284" y="884" class="font muted">说明：用户需要反馈时，从左侧“反馈管理”进入。</text>
+</svg>

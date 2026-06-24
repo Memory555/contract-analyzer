@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="960" viewBox="0 0 1440 960">
+  <rect width="1440" height="960" fill="#f4f7fb"/>
+  <style>.font{font-family:"Microsoft YaHei",Arial,sans-serif}.title{font-size:26px;font-weight:700;fill:#172033}.h2{font-size:20px;font-weight:700;fill:#172033}.body{font-size:15px;fill:#475569}.muted{font-size:13px;fill:#7b8798}.panel{fill:#fff;stroke:#d9e1ec;stroke-width:2}.active{fill:#eef6ff;stroke:#7aa7d9;stroke-width:2}.btn{fill:#2563eb}.ok{fill:#16a34a}.warn{fill:#fff7ed;stroke:#fdba74;stroke-width:1.5}.chip{fill:#fff;stroke:#cbd5e1;stroke-width:1.5}.chipActive{fill:#fff7ed;stroke:#fdba74;stroke-width:2}.auto{fill:#f0fdf4;stroke:#bbf7d0;stroke-width:1.5}</style>
+  <rect x="0" y="0" width="244" height="960" fill="#102033"/>
+  <text x="44" y="180" class="font" font-size="16" fill="#b8c7da">合同分析</text>
+  <text x="44" y="232" class="font" font-size="16" fill="#b8c7da">导出中心</text>
+  <rect x="16" y="254" width="212" height="48" rx="8" fill="#223a56"/><rect x="16" y="254" width="4" height="48" rx="2" fill="#4aa3ff"/><text x="44" y="284" class="font" font-size="16" font-weight="700" fill="#fff">反馈管理</text>
+  <text x="44" y="336" class="font" font-size="16" fill="#b8c7da">设置</text>
+  <rect x="244" y="0" width="1196" height="84" fill="#fff"/>
+  <text x="284" y="36" class="font muted">原型 4 / 补充说明与提交</text>
+  <text x="284" y="66" class="font title">选择问题类型后，补充说明可选，系统自动带入上下文</text>
+  
+  <rect x="284" y="124" width="410" height="720" rx="8" class="panel"/><text x="316" y="164" class="font h2">历史合同分析</text><rect x="316" y="226" width="346" height="92" rx="8" class="active"/><text x="340" y="260" class="font h2">采购合同-设备供货.docx</text><text x="340" y="286" class="font muted">2026-06-22 16:30 · 风险项 3 · 正在反馈</text>
+  <rect x="724" y="124" width="636" height="720" rx="8" class="panel"/><text x="756" y="164" class="font h2">提交反馈</text><text x="756" y="194" class="font muted">已选择：有问题 / 漏了重要条款</text><text x="756" y="248" class="font h2">可选补充说明</text><rect x="756" y="272" width="572" height="112" rx="8" fill="#f8fafc" stroke="#d9e1ec"/><text x="780" y="310" class="font muted">愿意的话，补充一句哪里不对。例如：补充协议第二页还有尾款约定。</text>
+  <text x="756" y="436" class="font h2">系统自动保存</text><rect x="756" y="464" width="272" height="44" rx="8" class="auto"/><text x="778" y="492" class="font body">分析时间：2026-06-22 16:30</text><rect x="1056" y="464" width="272" height="44" rx="8" class="auto"/><text x="1078" y="492" class="font body">模型名称：openai/gpt-oss-120b</text><rect x="756" y="520" width="272" height="44" rx="8" class="auto"/><text x="778" y="548" class="font body">prompt 版本：v3-feedback-001</text><rect x="1056" y="520" width="272" height="44" rx="8" class="auto"/><text x="1078" y="548" class="font body">风险项数量：3</text><rect x="756" y="576" width="572" height="44" rx="8" class="auto"/><text x="778" y="604" class="font body">分析结果摘要：付款计划、质保明细、合同问题摘要</text><rect x="756" y="632" width="572" height="44" rx="8" class="auto"/><text x="778" y="660" class="font body">合同原文：服务端保存，不要求用户填写</text>
+  <rect x="756" y="728" width="118" height="40" rx="20" fill="#f8fafc" stroke="#d9e1ec"/><text x="815" y="754" text-anchor="middle" class="font body">上一步</text><rect x="890" y="728" width="136" height="40" rx="20" class="btn"/><text x="958" y="754" text-anchor="middle" class="font" font-size="15" font-weight="700" fill="#fff">提交反馈</text>
+  <text x="284" y="884" class="font muted">说明：用户只补充主观判断；分析上下文由系统从历史记录自动带入。</text>
+</svg>

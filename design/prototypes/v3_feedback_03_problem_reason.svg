@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="960" viewBox="0 0 1440 960">
+  <rect width="1440" height="960" fill="#f4f7fb"/>
+  <style>.font{font-family:"Microsoft YaHei",Arial,sans-serif}.title{font-size:26px;font-weight:700;fill:#172033}.h2{font-size:20px;font-weight:700;fill:#172033}.body{font-size:15px;fill:#475569}.muted{font-size:13px;fill:#7b8798}.panel{fill:#fff;stroke:#d9e1ec;stroke-width:2}.active{fill:#eef6ff;stroke:#7aa7d9;stroke-width:2}.btn{fill:#2563eb}.ok{fill:#16a34a}.warn{fill:#fff7ed;stroke:#fdba74;stroke-width:1.5}.chip{fill:#fff;stroke:#cbd5e1;stroke-width:1.5}.chipActive{fill:#fff7ed;stroke:#fdba74;stroke-width:2}.auto{fill:#f0fdf4;stroke:#bbf7d0;stroke-width:1.5}</style>
+  <rect x="0" y="0" width="244" height="960" fill="#102033"/>
+  <text x="44" y="180" class="font" font-size="16" fill="#b8c7da">合同分析</text>
+  <text x="44" y="232" class="font" font-size="16" fill="#b8c7da">导出中心</text>
+  <rect x="16" y="254" width="212" height="48" rx="8" fill="#223a56"/><rect x="16" y="254" width="4" height="48" rx="2" fill="#4aa3ff"/><text x="44" y="284" class="font" font-size="16" font-weight="700" fill="#fff">反馈管理</text>
+  <text x="44" y="336" class="font" font-size="16" fill="#b8c7da">设置</text>
+  <rect x="244" y="0" width="1196" height="84" fill="#fff"/>
+  <text x="284" y="36" class="font muted">原型 3 / 有问题后的下一步</text>
+  <text x="284" y="66" class="font title">只有选择“有问题”后，才出现问题类型</text>
+  
+  <rect x="284" y="124" width="410" height="720" rx="8" class="panel"/><text x="316" y="164" class="font h2">历史合同分析</text><rect x="316" y="226" width="346" height="92" rx="8" class="active"/><text x="340" y="260" class="font h2">采购合同-设备供货.docx</text><text x="340" y="286" class="font muted">2026-06-22 16:30 · 风险项 3 · 正在反馈</text>
+  <rect x="724" y="124" width="636" height="720" rx="8" class="panel"/><text x="756" y="164" class="font h2">哪里有问题？</text><text x="756" y="194" class="font muted">用户刚选择“有问题”，此时才展示问题原因。</text>
+  <rect x="756" y="252" width="170" height="44" rx="22" class="chipActive"/><text x="841" y="280" text-anchor="middle" class="font body">漏了重要条款</text><rect x="944" y="252" width="150" height="44" rx="22" class="chip"/><text x="1019" y="280" text-anchor="middle" class="font body">判断不准确</text><rect x="1112" y="252" width="160" height="44" rx="22" class="chip"/><text x="1192" y="280" text-anchor="middle" class="font body">风险等级不对</text>
+  <rect x="756" y="318" width="150" height="44" rx="22" class="chip"/><text x="831" y="346" text-anchor="middle" class="font body">内容看不懂</text><rect x="924" y="318" width="92" height="44" rx="22" class="chip"/><text x="970" y="346" text-anchor="middle" class="font body">其他</text>
+  <rect x="756" y="620" width="118" height="40" rx="20" fill="#f8fafc" stroke="#d9e1ec"/><text x="815" y="646" text-anchor="middle" class="font body">上一步</text><rect x="890" y="620" width="136" height="40" rx="20" class="btn"/><text x="958" y="646" text-anchor="middle" class="font" font-size="15" font-weight="700" fill="#fff">下一步</text>
+  <text x="284" y="884" class="font muted">说明：问题类型是条件出现，不在第一屏增加用户负担。</text>
+</svg>

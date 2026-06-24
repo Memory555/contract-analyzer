@@ -18,3 +18,4 @@ temp/
 uploads/
 downloads/
 cloudflare-env.d.ts
+*.tsbuildinfo

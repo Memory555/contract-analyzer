@@ -7,6 +7,7 @@ import {
   FileCheck2,
   FileText,
   Loader2,
+  MessageSquareText,
   Settings,
   UploadCloud
 } from "lucide-react";
@@ -48,15 +49,17 @@ import { BatchWorkspace } from "@/app/components/BatchWorkspace";
 import { BatchHistoryPanel } from "@/app/components/BatchHistoryPanel";
 import { ExportCenterPage } from "@/app/components/ExportCenterPage";
 import { SettingsPage, type LlmSettings } from "@/app/components/SettingsPage";
+import { FeedbackManagementPage } from "@/app/components/FeedbackManagementPage";
 import { EmptyStateGuide } from "@/app/components/EmptyStateGuide";
 import { AppProvider, useAppState, useAppDispatch, type AppAction } from "@/app/components/AppContext";
 
 type Status = "idle" | "uploading" | "analyzing" | "success" | "error";
-type PageKey = "analysis" | "exports" | "settings";
+type PageKey = "analysis" | "exports" | "feedback" | "settings";
 
 const navItems = [
   { key: "analysis" as const, label: "合同分析", icon: FileText },
   { key: "exports" as const, label: "导出中心", icon: Loader2 },
+  { key: "feedback" as const, label: "反馈管理", icon: MessageSquareText },
   { key: "settings" as const, label: "设置", icon: Settings }
 ];
 
@@ -276,6 +279,7 @@ function Home() {
       const successContract = {
         ...analyzingContract,
         status: "success" as const,
+        contractText,
         result: analysis,
         errorMessage: undefined,
         updatedAt: new Date().toISOString()
@@ -611,6 +615,8 @@ function Home() {
             onOpenBatch={openBatch}
             onBatchExport={() => void handleBatchExport()}
           />
+        ) : activePage === "feedback" ? (
+          <FeedbackManagementPage modelName={llmSettings.openaiModel.trim() || "环境默认模型"} />
         ) : activePage === "settings" ? (
           <SettingsPage
             settings={llmSettings}
