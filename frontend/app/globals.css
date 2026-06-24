@@ -213,6 +213,7 @@
 
 html {
   zoom: 0.8;
+  height: 100%;
 }
 
 * {
@@ -224,6 +225,7 @@ body {
   color: var(--text);
   background: var(--bg);
   font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+  min-height: 100%;
 }
 
 button,
@@ -253,6 +255,7 @@ a:focus-visible,
   min-height: 100vh;
   display: grid;
   grid-template-columns: 260px 1fr;
+  grid-template-rows: minmax(100vh, auto);
   transition: grid-template-columns var(--transition-slow);
 }
 
@@ -263,13 +266,15 @@ a:focus-visible,
 .sidebar {
   position: sticky;
   top: 0;
+  align-self: start;
+  max-height: 100vh;
   height: 100vh;
   background: var(--nav);
   color: white;
   padding: 28px 18px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
   transition: padding var(--transition-slow);
 }
 
