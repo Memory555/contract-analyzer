@@ -255,7 +255,6 @@ a:focus-visible,
   min-height: 100vh;
   display: grid;
   grid-template-columns: 260px 1fr;
-  grid-template-rows: minmax(100vh, auto);
   transition: grid-template-columns var(--transition-slow);
 }
 
@@ -266,15 +265,15 @@ a:focus-visible,
 .sidebar {
   position: sticky;
   top: 0;
-  align-self: start;
-  max-height: 100vh;
-  height: 100vh;
+  /* 补偿 html zoom:0.8，使侧边栏视觉上铺满全屏 */
+  height: 125vh;
   background: var(--nav);
   color: white;
   padding: 28px 18px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  overflow-x: hidden;
   transition: padding var(--transition-slow);
 }
 
