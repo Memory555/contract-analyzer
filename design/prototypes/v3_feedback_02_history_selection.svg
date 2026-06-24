@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="960" viewBox="0 0 1440 960">
+  <rect width="1440" height="960" fill="#f4f7fb"/>
+  <style>.font{font-family:"Microsoft YaHei",Arial,sans-serif}.title{font-size:26px;font-weight:700;fill:#172033}.h2{font-size:20px;font-weight:700;fill:#172033}.body{font-size:15px;fill:#475569}.muted{font-size:13px;fill:#7b8798}.panel{fill:#fff;stroke:#d9e1ec;stroke-width:2}.active{fill:#eef6ff;stroke:#7aa7d9;stroke-width:2}.btn{fill:#2563eb}.ok{fill:#16a34a}.warn{fill:#fff7ed;stroke:#fdba74;stroke-width:1.5}.chip{fill:#fff;stroke:#cbd5e1;stroke-width:1.5}.chipActive{fill:#fff7ed;stroke:#fdba74;stroke-width:2}.auto{fill:#f0fdf4;stroke:#bbf7d0;stroke-width:1.5}</style>
+  <rect x="0" y="0" width="244" height="960" fill="#102033"/>
+  <text x="44" y="180" class="font" font-size="16" fill="#b8c7da">合同分析</text>
+  <text x="44" y="232" class="font" font-size="16" fill="#b8c7da">导出中心</text>
+  <rect x="16" y="254" width="212" height="48" rx="8" fill="#223a56"/><rect x="16" y="254" width="4" height="48" rx="2" fill="#4aa3ff"/><text x="44" y="284" class="font" font-size="16" font-weight="700" fill="#fff">反馈管理</text>
+  <text x="44" y="336" class="font" font-size="16" fill="#b8c7da">设置</text>
+  <rect x="244" y="0" width="1196" height="84" fill="#fff"/>
+  <text x="284" y="36" class="font muted">原型 2 / 反馈管理：历史记录选择</text>
+  <text x="284" y="66" class="font title">选择一个历史合同分析，再进行反馈</text>
+  
+  <rect x="284" y="124" width="410" height="720" rx="8" class="panel"/><text x="316" y="164" class="font h2">历史合同分析</text><text x="316" y="194" class="font muted">按分析时间倒序展示，可反馈过去某一次结果</text>
+  <rect x="316" y="226" width="346" height="92" rx="8" class="active"/><text x="340" y="260" class="font h2">采购合同-设备供货.docx</text><text x="340" y="286" class="font muted">2026-06-22 16:30 · 风险项 3 · 未反馈</text>
+  <rect x="316" y="334" width="346" height="92" rx="8" fill="#fff" stroke="#e2e8f0"/><text x="340" y="368" class="font h2">补充协议-尾款调整.docx</text><text x="340" y="394" class="font muted">2026-06-22 15:48 · 风险项 1 · 有问题</text>
+  <rect x="724" y="124" width="636" height="720" rx="8" class="panel"/><text x="756" y="164" class="font h2">采购合同-设备供货.docx</text><rect x="756" y="228" width="572" height="96" rx="8" fill="#f8fbff"/><text x="780" y="262" class="font body">摘要：识别出付款计划 4 条、质保字段 6 条、风险项 3 条。</text><text x="780" y="292" class="font body">高风险：付款节点缺少明确发票条件。</text>
+  <rect x="756" y="548" width="572" height="156" rx="8" fill="#fff" stroke="#bfdbfe" stroke-width="2"/><text x="780" y="586" class="font h2">这次历史分析对你有帮助吗？</text><text x="780" y="616" class="font muted">点“有帮助”会直接提交；点“有问题”才进入下一步。</text><rect x="780" y="646" width="120" height="40" rx="20" class="ok"/><text x="840" y="672" text-anchor="middle" class="font" font-size="15" font-weight="700" fill="#fff">有帮助</text><rect x="916" y="646" width="120" height="40" rx="20" class="warn"/><text x="976" y="672" text-anchor="middle" class="font" font-size="15" font-weight="700" fill="#c2410c">有问题</text>
+  <text x="284" y="884" class="font muted">说明：反馈动作绑定到某条历史分析记录，而不是要求用户重新上传合同。</text>
+</svg>

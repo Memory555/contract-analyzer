@@ -14,7 +14,9 @@
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
+    "@cloudbase/node-sdk": "^3.18.3",
     "@opennextjs/cloudflare": "^1.19.11",
+    "@types/pg": "^8.20.0",
     "@vitejs/plugin-react": "^4.7.0",
     "dexie": "^4.2.1",
     "exceljs": "^4.4.0",
@@ -22,6 +24,7 @@
     "mammoth": "^1.11.0",
     "next": "^15.5.7",
     "openai": "^6.9.1",
+    "pg": "^8.22.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "zod": "^4.2.1"
