@@ -1,4 +1,4 @@
-import { Pool, type PoolClient } from "pg";
+import { Pool, type PoolClient, type PoolConfig } from "pg";
 
 export type FeedbackRow = {
   id: string;
@@ -21,16 +21,48 @@ export type FeedbackRow = {
 
 let pool: Pool | null = null;
 
+function shouldUseSsl(databaseUrl?: string): PoolConfig["ssl"] {
+  const sslFlag = process.env.PG_SSL?.toLowerCase();
+  if (sslFlag === "false" || sslFlag === "0" || sslFlag === "disable") {
+    return false;
+  }
+
+  if (sslFlag === "true" || sslFlag === "1" || sslFlag === "require") {
+    return process.env.PG_SSL_REJECT_UNAUTHORIZED === "false" ? { rejectUnauthorized: false } : true;
+  }
+
+  if (!databaseUrl) return false;
+
+  try {
+    const url = new URL(databaseUrl);
+    const sslMode = url.searchParams.get("sslmode")?.toLowerCase();
+
+    if (sslMode === "disable") return false;
+    if (sslMode === "require" || sslMode === "verify-ca" || sslMode === "verify-full") {
+      return process.env.PG_SSL_REJECT_UNAUTHORIZED === "false" ? { rejectUnauthorized: false } : true;
+    }
+
+    if (url.hostname.endsWith(".neon.tech")) {
+      return process.env.PG_SSL_REJECT_UNAUTHORIZED === "false" ? { rejectUnauthorized: false } : true;
+    }
+  } catch {
+    return false;
+  }
+
+  return false;
+}
+
 export function getPool(): Pool {
   if (pool) return pool;
 
+  const databaseUrl = process.env.DATABASE_URL;
   const host = process.env.PG_HOST;
   const port = parseInt(process.env.PG_PORT || "5432", 10);
   const user = process.env.PG_USER;
   const password = process.env.PG_PASSWORD;
   const database = process.env.PG_DATABASE || "postgres";
 
-  if (!host || !user || !password) {
+  if (!databaseUrl && (!host || !user || !password)) {
     throw new Error(
       `PostgreSQL 未配置，缺少环境变量：${[
         !host && "PG_HOST",
@@ -40,25 +72,36 @@ export function getPool(): Pool {
     );
   }
 
-  pool = new Pool({
-    host,
-    port,
-    user,
-    password,
-    database,
+  const baseConfig: PoolConfig = {
     max: 10,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 10000,
-    ssl: false,
-    // 显式指定 UTF-8 编码，防止 Windows 环境下默认编码不一致导致中文乱码
-    options: "-c client_encoding=UTF8",
-  });
+    ssl: shouldUseSsl(databaseUrl),
+  };
+
+  pool = new Pool(databaseUrl
+    ? {
+        ...baseConfig,
+        connectionString: databaseUrl,
+      }
+    : {
+        ...baseConfig,
+        host,
+        port,
+        user,
+        password,
+        database,
+        // Keep client encoding explicit for non-DATABASE_URL deployments.
+        options: "-c client_encoding=UTF8",
+      });
 
   return pool;
 }
 
 export function checkPostgresConfig(): string[] {
   const missing: string[] = [];
+  if (process.env.DATABASE_URL) return missing;
+
   if (!process.env.PG_HOST) missing.push("PG_HOST");
   if (!process.env.PG_USER) missing.push("PG_USER");
   if (!process.env.PG_PASSWORD) missing.push("PG_PASSWORD");
