@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>合同智能分析平台 v5</title>
+<style>
+  :root {
+    --bg: #f8f9fb;
+    --card-bg: #ffffff;
+    --primary: #2563eb;
+    --primary-light: #dbeafe;
+    --accent: #7c3aed;
+    --accent-light: #ede9fe;
+    --success: #059669;
+    --success-light: #d1fae5;
+    --warning: #d97706;
+    --warning-light: #fef3c7;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --info: #0284c7;
+    --info-light: #e0f2fe;
+    --text: #1e293b;
+    --text-secondary: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { margin:0; padding:0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Hero Header */
+  .hero {
+    background: linear-gradient(135deg, #1e40af 0%, #7c3aed 50%, #db2777 100%);
+    color: white;
+    padding: 48px 32px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 70%, rgba(255,255,255,0.08) 0%, transparent 50%);
+    animation: heroFloat 20s ease-in-out infinite;
+  }
+  @keyframes heroFloat {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(5%, -3%); }
+  }
+  .hero h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+  .hero .meta {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+  }
+  .hero .meta-item {
+    background: rgba(255,255,255,0.15);
+    padding: 6px 16px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hero .meta-item a {
+    color: white;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .hero .meta-item a:hover { opacity: 0.85; }
+
+  /* Nav Tabs */
+  .nav-tabs {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    padding: 12px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+    flex-wrap: wrap;
+  }
+  .nav-tab {
+    padding: 8px 20px;
+    border-radius: 24px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .nav-tab:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+  .nav-tab.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  .nav-tab .tab-icon {
+    margin-right: 6px;
+    font-size: 1rem;
+  }
+
+  /* Main Content */
+  .main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+  }
+
+  .section {
+    display: none;
+    animation: fadeSlideIn 0.35s ease-out;
+  }
+  .section.visible { display: block; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Section Title */
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .icon {
+    width: 36px;
+    height: 36px;
+    background: var(--primary-light);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--primary);
+  }
+
+  /* Intro Card */
+  .intro-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 24px;
+    line-height: 1.8;
+  }
+  .intro-card .lead {
+    font-size: 1.05rem;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  /* Feature Cards */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .feature-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+    border: 1px solid var(--border);
+  }
+  .feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+  }
+  .feature-card .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .feature-card .card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+  }
+  .feature-card .card-label {
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  .feature-card .card-desc {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .fc-analyze .card-icon { background: var(--primary-light); color: var(--primary); }
+  .fc-export .card-icon { background: var(--success-light); color: var(--success); }
+  .fc-feedback .card-icon { background: var(--accent-light); color: var(--accent); }
+  .fc-settings .card-icon { background: var(--warning-light); color: var(--warning); }
+
+  /* Table Styles */
+  .styled-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 16px 0;
+    font-size: 0.88rem;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .styled-table thead th {
+    background: var(--primary);
+    color: white;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .styled-table thead th:first-child { border-radius: var(--radius) 0 0 0; }
+  .styled-table thead th:last-child { border-radius: 0 var(--radius) 0 0; }
+  .styled-table tbody td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .styled-table tbody tr:last-child td { border-bottom: none; }
+  .styled-table tbody tr:hover {
+    background: var(--primary-light);
+  }
+  .styled-table tbody tr {
+    transition: background 0.15s;
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-primary { background: var(--primary-light); color: var(--primary); }
+  .badge-accent { background: var(--accent-light); color: var(--accent); }
+  .badge-success { background: var(--success-light); color: var(--success); }
+  .badge-warning { background: var(--warning-light); color: var(--warning); }
+  .badge-danger { background: var(--danger-light); color: var(--danger); }
+  .badge-info { background: var(--info-light); color: var(--info); }
+
+  /* Info Box */
+  .info-box {
+    background: var(--info-light);
+    border: 1px solid #bae6fd;
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .info-box .info-icon {
+    font-size: 1.1rem;
+    margin-top: 2px;
+  }
+  .info-box strong { color: var(--info); }
+
+  .note-box {
+    background: var(--warning-light);
+    border: 1px solid #fde68a;
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .note-box .note-icon { font-size: 1.1rem; margin-top: 2px; }
+
+  /* Step List */
+  .step-list {
+    counter-reset: step-counter;
+  }
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 0;
+    position: relative;
+  }
+  .step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 48px;
+    width: 2px;
+    height: calc(100% - 32px);
+    background: var(--primary-light);
+  }
+  .step-item .step-num {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .step-item .step-content {
+    flex: 1;
+  }
+  .step-item .step-content .step-text {
+    font-size: 0.92rem;
+    line-height: 1.7;
+  }
+  .step-item .step-content .step-code {
+    font-family: monospace;
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+  }
+
+  /* Skill Section Specific */
+  .skill-hero {
+    background: linear-gradient(135deg, #059669 0%, #0891b2 50%, #2563eb 100%);
+    color: white;
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .skill-hero h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .skill-hero p {
+    font-size: 0.95rem;
+    opacity: 0.92;
+    line-height: 1.7;
+  }
+  .skill-hero .skill-version {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    background: rgba(255,255,255,0.18);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .download-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .download-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .download-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--success);
+  }
+  .download-card .dl-icon {
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+  }
+  .download-card .dl-label {
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .download-card .dl-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+  .download-card .dl-btn {
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .dl-btn-primary {
+    background: var(--success);
+    color: white;
+  }
+  .dl-btn-primary:hover { background: #047857; }
+  .dl-btn-accent {
+    background: var(--primary);
+    color: white;
+  }
+  .dl-btn-accent:hover { background: #1d4ed8; }
+
+  .code-block {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin: 16px 0;
+  }
+  .code-block .comment { color: #94a3b8; }
+  .code-block .cmd { color: #7dd3fc; }
+  .code-block .arg { color: #fbbf24; }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 16px 0;
+    font-size: 0.88rem;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .compare-table thead th {
+    background: var(--accent);
+    color: white;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .compare-table tbody td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .compare-table tbody tr:last-child td { border-bottom: none; }
+  .compare-table tbody tr:nth-child(even) { background: #f8fafc; }
+
+  .platform-logos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 16px 0;
+    justify-content: center;
+  }
+  .platform-logo {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 18px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 24px 16px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .feature-grid, .download-cards { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.4rem; }
+    .nav-tab { padding: 6px 12px; font-size: 0.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>🤖 合同智能分析平台 v5</h1>
+  <div class="meta">
+    <div class="meta-item">📅 2026-06-26</div>
+    <div class="meta-item">🆕 新增：Skill 独立版本</div>
+    <div class="meta-item">🔗 GitHub：<a href="https://github.com/Memory555/contract-analyzer" target="_blank">Memory555/contract-analyzer</a></div>
+  </div>
+</div>
+
+<!-- Nav Tabs -->
+<div class="nav-tabs" id="navTabs">
+  <div class="nav-tab active" data-tab="overview"><span class="tab-icon">📋</span>平台概览</div>
+  <div class="nav-tab" data-tab="skill"><span class="tab-icon">🛠️</span>Skill 说明</div>
+  <div class="nav-tab" data-tab="tech"><span class="tab-icon">🧱</span>技术栈</div>
+  <div class="nav-tab" data-tab="deploy"><span class="tab-icon">☁️</span>部署平台</div>
+  <div class="nav-tab" data-tab="limits"><span class="tab-icon">⚠️</span>当前限制</div>
+  <div class="nav-tab" data-tab="verify"><span class="tab-icon">✅</span>验证步骤</div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Section 1: Overview -->
+  <div class="section visible" id="sec-overview">
+    <div class="section-title"><div class="icon">📋</div> 平台是什么</div>
+    <div class="intro-card">
+      <div class="lead">合同智能分析平台是一款面向合同审查人员的辅助工具，核心能力是把 DOCX 合同文件交给 AI 模型自动提取和检查，输出结构化的<span class="badge badge-primary">付款计划</span>、<span class="badge badge-accent">质保明细</span>和<span class="badge badge-warning">风险提示</span>，降低人工逐页翻阅的成本。</div>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card fc-analyze">
+        <div class="card-header">
+          <div class="card-icon">🔍</div>
+          <div class="card-label">合同分析</div>
+        </div>
+        <div class="card-desc">上传 DOCX → AI 自动提取付款计划（阶段、比例、时限）、质保明细（核心 + 扩展字段）、合同问题（error / warning / info 三级）；支持单份和批量（最多 <span class="badge badge-primary">20 份</span>），串行执行、单份失败不影响其余</div>
+      </div>
+      <div class="feature-card fc-export">
+        <div class="card-header">
+          <div class="card-icon">📊</div>
+          <div class="card-label">导出中心</div>
+        </div>
+        <div class="card-desc">单合同 Excel 导出；批量汇总 Excel（5 个 Sheet：概览、付款计划、质保、问题、失败清单）</div>
+      </div>
+      <div class="feature-card fc-feedback">
+        <div class="card-header">
+          <div class="card-icon">💬</div>
+          <div class="card-label">反馈管理</div>
+        </div>
+        <div class="card-desc">对分析结果提交"有帮助"或"有问题"反馈；问题可选 5 种分类；另提供"我的云端总览"统计卡片 + 分页列表</div>
+      </div>
+      <div class="feature-card fc-settings">
+        <div class="card-header">
+          <div class="card-icon">⚙️</div>
+          <div class="card-label">设置</div>
+        </div>
+        <div class="card-desc">配置模型服务（Base URL / API Key / 模型名）、联通测试、切换亮/暗色主题、清除本地数据</div>
+      </div>
+    </div>
+
+    <div class="info-box" style="margin-top: 24px;">
+      <div class="info-icon">🆕</div>
+      <div><strong>v5 新增：</strong>Skill 独立版本 —— 一个轻量级的命令行工具，用于偶尔分析 1-2 份合同，无需部署平台，可在各类 AI 工具中使用。详见「<a href="javascript:void(0)" onclick="switchTab('skill')" style="color:var(--primary);cursor:pointer;">Skill 说明</a>」标签页。</div>
+    </div>
+  </div>
+
+  <!-- Section 2: Skill 说明 -->
+  <div class="section" id="sec-skill">
+    <div class="section-title"><div class="icon">🛠️</div> Skill 说明</div>
+
+    <div class="skill-hero">
+      <div class="skill-version">v5.0.0</div>
+      <h2>合同智能分析 Skill</h2>
+      <p>轻量级命令行工具，用于快速分析单份 DOCX 合同文件。<br>无需部署平台，适合偶尔分析 1-2 份合同的场景。</p>
+    </div>
+
+    <!-- 适用场景 -->
+    <div class="intro-card">
+      <div class="lead"><strong>适用场景</strong></div>
+      <table class="compare-table">
+        <thead><tr><th>使用方式</th><th>平台版本（v4）</th><th>Skill 版本（v5）</th></tr></thead>
+        <tbody>
+          <tr><td>交互方式</td><td>Web 界面</td><td>命令行 / 对话</td></tr>
+          <tr><td>适用频率</td><td>高频、团队协作</td><td>偶尔分析 1-2 份</td></tr>
+          <tr><td>批量分析</td><td>支持（最多 20 份）</td><td>不支持（单份）</td></tr>
+          <tr><td>历史记录</td><td>本地 IndexedDB + 云端</td><td>无（临时分析）</td></tr>
+          <tr><td>Excel 导出</td><td>多 Sheet 批量汇总</td><td>不支持（仅文本报告）</td></tr>
+          <tr><td>部署要求</td><td>需部署到云平台</td><td>无需部署，直接运行</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 下载卡片 -->
+    <div class="intro-card">
+      <div class="lead"><strong>📦 下载与安装</strong></div>
+      <div class="download-cards">
+        <div class="download-card">
+          <div class="dl-icon">📦</div>
+          <div class="dl-label">从 GitHub Releases 下载</div>
+          <div class="dl-desc">下载打包好的 skill.zip，解压即可使用</div>
+          <a href="https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill.zip" class="dl-btn dl-btn-primary" target="_blank">下载 v5.0.0</a>
+        </div>
+        <div class="download-card">
+          <div class="dl-icon">🐙</div>
+          <div class="dl-label">从源码安装</div>
+          <div class="dl-desc">克隆仓库 v5 分支，自行安装依赖</div>
+          <a href="https://github.com/Memory555/contract-analyzer/tree/v5" class="dl-btn dl-btn-accent" target="_blank">查看 v5 分支</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 安装步骤 -->
+    <div class="intro-card">
+      <div class="lead"><strong>⚡ 快速开始</strong></div>
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-text">下载并解压 skill 包，或克隆 v5 分支：</div>
+            <div class="code-block"><span class="comment"># 方式一：下载 Releases 包</span>
+<span class="cmd">curl</span> <span class="arg">-L</span> https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill.zip <span class="cmd">-o</span> skill.zip
+<span class="cmd">unzip</span> skill.zip <span class="cmd">-d</span> contract-analyzer-skill
+
+<span class="comment"># 方式二：克隆仓库</span>
+<span class="cmd">git clone</span> https://github.com/Memory555/contract-analyzer.git <span class="cmd">-b</span> v5
+<span class="cmd">cd</span> contract-analyzer/skill</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-text">安装依赖：</div>
+            <div class="code-block"><span class="cmd">cd</span> contract-analyzer/skill  <span class="comment"># 或解压后的 skill 目录</span>
+<span class="cmd">npm install</span></div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-text">配置 API Key 并运行分析：</div>
+            <div class="code-block"><span class="comment"># 方式一：环境变量（推荐）</span>
+<span class="cmd">export</span> <span class="arg">OPENAI_API_KEY</span>=<span class="comment">"your-api-key"</span>
+<span class="cmd">export</span> <span class="arg">OPENAI_BASE_URL</span>=<span class="comment">"https://api.openai.com/v1"</span>
+<span class="cmd">node</span> scripts/analyze.js <span class="arg">--file</span> 合同.docx
+
+<span class="comment"># 方式二：命令行参数</span>
+<span class="cmd">node</span> scripts/analyze.js <span class="arg">--file</span> 合同.docx <span class="arg">--api-key</span> your-key <span class="arg">--base-url</span> https://api.deepseek.com/v1
+
+<span class="comment"># 输出到文件</span>
+<span class="cmd">node</span> scripts/analyze.js <span class="arg">--file</span> 合同.docx <span class="arg">--output</span> 分析结果.md</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 支持的 AI 平台 -->
+    <div class="intro-card">
+      <div class="lead"><strong>🤖 支持的 AI 平台</strong></div>
+      <p style="font-size:0.92rem;margin-bottom:12px;">Skill 基于 OpenAI SDK，兼容任何 OpenAI 协议的服务：</p>
+      <table class="styled-table">
+        <thead><tr><th>平台</th><th>Base URL</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-primary">OpenAI</span></td><td><code>https://api.openai.com/v1</code></td><td>官方接口，默认使用</td></tr>
+          <tr><td><span class="badge badge-accent">NVIDIA NIM</span></td><td><code>https://integrate.api.nvidia.com/v1</code></td><td>需要 NVIDIA API Key</td></tr>
+          <tr><td><span class="badge badge-success">DeepSeek</span></td><td><code>https://api.deepseek.com/v1</code></td><td>DeepSeek 官方</td></tr>
+          <tr><td><span class="badge badge-warning">阿里百炼</span></td><td><code>https://dashscope.aliyuncs.com/compatible-mode/v1</code></td><td>通义千问等模型</td></tr>
+          <tr><td><span class="badge badge-info">自定义</span></td><td>任何 OpenAI-compatible 服务</td><td>如 vLLM、Ollama 等</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 输出示例 -->
+    <div class="intro-card">
+      <div class="lead"><strong>📋 输出示例</strong></div>
+      <div class="code-block" style="white-space:pre-wrap;max-height:400px;overflow-y:auto;"># 合同分析结果
+
+**文件：** 采购合同.docx
+**分析时间：** 2026/6/26 12:00:00
+
+## 📊 置信度
+
+| 维度 | 分数 |
+|------|------|
+| 整体 | 0.92 |
+| 付款计划 | 0.95 |
+| 质保明细 | 0.88 |
+| 问题检测 | 0.90 |
+
+## 💳 付款计划
+
+| 阶段 | 名称 | 比例 | 触发条件 | 时限 | 备注 |
+|------|------|------|----------|------|------|
+| 第一阶段 | 预付款 | 30% | ① 收到业主方首付款 ② 乙方提供增值税专票 | 60个工作日 | 背靠背付款 |
+| 第二阶段 | 验收款 | 65% | ① 系统上线验收合格 ② 乙方提供全额发票 | 30个工作日 | - |
+| 第三阶段 | 质保金 | 5% | 质保期满且无质量问题 | 15个工作日 | - |
+
+## 🔧 质保明细
+
+| 字段 | 内容 | 备注 |
+|------|------|------|
+| 质保期 | 验收合格之日起 1 年 | - |
+| 响应时效 | 重大故障：0.5h 响应，3h 解决 | - |
+| 违约金 | 一般故障超时：1000元/次 | - |
+
+## ⚠️ 合同问题
+
+🔴 **条款矛盾**【ERROR】
+- 问题：5.4 条款写 3 年质保期，7.1 条款写 1 年质保期
+- 位置：第五条 vs 第七条
+- 原文：第五条约定质保期为验收合格后 3 年；第七条约定质保期为 1 年...
+
+---
+> ⚠️ 免责声明：本分析结果仅供参考，不构成法律意见。请始终以合同原文为准。</div>
+    </div>
+
+    <div class="note-box">
+      <div class="note-icon">💡</div>
+      <div>Skill 版本的输出为 Markdown 格式，可直接在终端查看，也可保存为 <code>.md</code> 文件。使用 <code>--json</code> 参数可输出原始 JSON，便于嵌入其他自动化流程。</div>
+    </div>
+  </div>
+
+  <!-- Section 3: Tech Stack -->
+  <div class="section" id="sec-tech">
+    <div class="section-title"><div class="icon">🧱</div> 技术栈</div>
+    <table class="styled-table">
+      <thead>
+        <tr><th>层面</th><th>技术</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-primary">前端框架</span></td>
+          <td><strong>Next.js 15</strong>（App Router）+ React 19 + TypeScript</td>
+          <td>单页多面板架构，Serverless API Routes 兼做后端</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-accent">AI 调用</span></td>
+          <td><strong>OpenAI SDK</strong>（Responses API + JSON Schema Structured Outputs）</td>
+          <td>兼容任何 OpenAI 协议的服务</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-info">DOCX 提取</span></td>
+          <td><strong>mammoth.js</strong></td>
+          <td>浏览器端提取，无需后端</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-success">Excel 导出</span></td>
+          <td><strong>ExcelJS</strong></td>
+          <td>前端直接生成，无需后端</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-primary">云端数据库</span></td>
+          <td><strong>Neon PostgreSQL</strong>（新加坡节点）</td>
+          <td>反馈数据持久存储 + 用户数据隔离</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-info">本地数据库</span></td>
+          <td><strong>Dexie / IndexedDB</strong></td>
+          <td>历史记录、导出记录、反馈提交状态缓存</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-warning">容器化</span></td>
+          <td><strong>Dockerfile</strong>（三阶段构建，standalone 输出）</td>
+          <td>部署到 CloudBase 云托管</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-success">Skill 版本</span></td>
+          <td><strong>Node.js + mammoth + openai SDK</strong></td>
+          <td>命令行工具，无需浏览器，跨平台运行</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Section 4: Deployment -->
+  <div class="section" id="sec-deploy">
+    <div class="section-title"><div class="icon">☁️</div> 部署在什么平台</div>
+
+    <div class="intro-card">
+      <div class="lead">当前部署在<strong>腾讯 CloudBase 云托管</strong>，部署路径如下：</div>
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-text">编写 <span class="step-code">frontend/Dockerfile</span>（三阶段构建，standalone 输出）</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-text">CloudBase 云托管读取 Dockerfile，构建 Docker 镜像</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-text">镜像以 Next.js standalone 模式运行，监听 <span class="step-code">3000</span> 端口</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-text">CloudBase 提供公网访问地址，支持自定义域名</div>
+        </div>
+      </div>
+    </div>
+
+    <table class="styled-table">
+      <thead>
+        <tr><th>方式</th><th>说明</th><th>访问链接</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-primary">CloudBase（当前）</span></td>
+          <td>Dockerfile 三阶段构建，云托管弹性伸缩</td>
+          <td><a href="https://contract-analyzer-273126-6-1321049800.sh.run.tcloudbase.com" target="_blank" style="color:var(--primary);">线上地址</a></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-info">Vercel（备选）</span></td>
+          <td>vercel.json 已配置，可一键部署</td>
+          <td><a href="https://contract-analyzer-two-iota.vercel.app/" target="_blank" style="color:var(--info);">Vercel 地址</a> <span class="badge badge-warning">需外网 VPN</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Section 5: Limits -->
+  <div class="section" id="sec-limits">
+    <div class="section-title"><div class="icon">⚠️</div> 当前限制</div>
+
+    <div class="intro-card">
+      <div class="lead">v5 版本在 v4 平台基础上新增了 Skill 独立版本，以下是两个版本的共同限制和各自限制：</div>
+    </div>
+
+    <!-- 5.1 Platform Limits -->
+    <div class="limit-section">
+      <h3 style="font-size:1.15rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--warning);display:inline-block;"></span> 平台版本（v4）限制</h3>
+      <table class="styled-table">
+        <thead><tr><th>限制项</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-warning">环境 QPS</span></td><td>标准版：<strong>500 QPS</strong>；企业版：1000 QPS</td></tr>
+          <tr><td><span class="badge badge-danger">请求超时</span></td><td>云托管统一 <strong>60 秒</strong>超时</td></tr>
+          <tr><td><span class="badge badge-info">请求包体</span></td><td>最大 <strong>20 MB</strong></td></tr>
+          <tr><td><span class="badge badge-warning">数据库</span></td><td>标准版为共享实例；企业版以上为独享实例</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5.2 Skill Limits -->
+    <div class="limit-section" style="margin-top:24px;">
+      <h3 style="font-size:1.15rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--info);display:inline-block;"></span> Skill 版本（v5）限制</h3>
+      <table class="styled-table">
+        <thead><tr><th>限制项</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-warning">仅支持单份</span></td><td>不支持批量分析，每次只能分析一份合同</td></tr>
+          <tr><td><span class="badge badge-info">仅支持 DOCX</span></td><td>不支持 PDF、DOC、扫描件（需先用其他工具转换）</td></tr>
+          <tr><td><span class="badge badge-primary">需要 API Key</span></td><td>用户需自行提供 OpenAI 或兼容服务的 API Key</td></tr>
+          <tr><td><span class="badge badge-success">无历史记录</span></td><td>分析结果不保存，每次需重新分析</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5.3 Latency -->
+    <div class="limit-section" style="margin-top:24px;">
+      <h3 style="font-size:1.15rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--warning);display:inline-block;"></span> 模型响应延迟</h3>
+      <div class="intro-card" style="margin-bottom:16px;font-size:0.92rem;">一次完整的合同分析流程中，延迟主要受以下因素影响：</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;">
+        <div style="background:var(--card-bg);border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);">
+          <div style="font-weight:600;font-size:0.92rem;margin-bottom:8px;">📄 合同长度</div>
+          <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:6px;">文本越长，模型输入 token 越多，推理时间越长</div>
+          <div style="font-size:0.85rem;font-family:monospace;background:#f1f5f9;padding:6px 10px;border-radius:6px;">5页 ≈ 5-10s · 20页 ≈ 15-30s</div>
+        </div>
+        <div style="background:var(--card-bg);border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);">
+          <div style="font-weight:600;font-size:0.92rem;margin-bottom:8px;">🧠 模型服务</div>
+          <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:6px;">不同模型 / 不同提供商的推理速度差异很大</div>
+          <div style="font-size:0.85rem;font-family:monospace;background:#f1f5f9;padding:6px 10px;border-radius:6px;">GPT-4.1-mini: 3-8s/页</div>
+        </div>
+      </div>
+      <div class="note-box">
+        <div class="note-icon">📝</div>
+        <div><strong>总结：</strong>单份合同分析典型耗时 5-30 秒，主要由模型推理决定。Skill 版本为命令行工具，无浏览器开销，响应速度与平台版本相当。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 6: Verify -->
+  <div class="section" id="sec-verify">
+    <div class="section-title"><div class="icon">✅</div> 快速验证步骤</div>
+
+    <div class="intro-card">
+      <div class="lead"><strong>平台版本验证步骤：</strong></div>
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-text">CloudBase 云托管中新建服务，上传 <span class="step-code">frontend/Dockerfile</span> 并配置环境变量</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-text">等待构建完成（约 2-3 分钟）</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-text">访问服务公网地址，确认首页可打开</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-text">进入「设置」页面，点击「模型联通测试」确认 AI 服务可用</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-text">上传一份 DOCX 合同文件，执行分析，验证结果正常输出</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="intro-card" style="margin-top:32px;">
+      <div class="lead"><strong>Skill 版本验证步骤：</strong></div>
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-text">下载 skill 包并解压，进入 <span class="step-code">skill/</span> 目录，运行 <span class="step-code">npm install</span></div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-text">配置 API Key：<span class="step-code">export OPENAI_API_KEY="your-key"</span></div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-text">准备一份测试用 DOCX 合同文件</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-text">运行分析：<span class="step-code">node scripts/analyze.js --file 测试合同.docx</span></div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-text">确认终端输出 Markdown 格式的分析报告，包含付款计划、质保明细和合同问题</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">合同智能分析平台 v5 · 2026-06-26 · <a href="https://github.com/Memory555/contract-analyzer" target="_blank" style="color:var(--primary);">GitHub</a> · <a href="https://github.com/Memory555/contract-analyzer/releases" target="_blank" style="color:var(--primary);">Releases</a></div>
+
+<script>
+  // Tab Navigation
+  const tabs = document.querySelectorAll('.nav-tab');
+  const sections = {
+    overview: document.getElementById('sec-overview'),
+    skill: document.getElementById('sec-skill'),
+    tech: document.getElementById('sec-tech'),
+    deploy: document.getElementById('sec-deploy'),
+    limits: document.getElementById('sec-limits'),
+    verify: document.getElementById('sec-verify'),
+  };
+
+  function switchTab(key) {
+    tabs.forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-tab="${key}"]`).classList.add('active');
+    Object.values(sections).forEach(s => s.classList.remove('visible'));
+    sections[key].classList.add('visible');
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const key = tab.dataset.tab;
+      switchTab(key);
+    });
+  });
+
+  // Expose switchTab to global scope for the link in overview section
+  window.switchTab = switchTab;
+</script>
+
+</body>
+</html>
