@@ -64,37 +64,20 @@ agent_created: true
 > ⚠️ **发现 1 个问题**
 > 【ERROR】条款矛盾：...
 
-#### 安装方式 B：下载到本地项目中使用
+#### 安装方式 B：下载后从本地路径安装
 
-适合开发者或需要离线使用的场景。下载 Skill 包到本地，通过代码调用或命令行运行。
+适合网络受限或需要自定义 Skill 的场景。手动下载到本地，然后在 AI 平台中指定本地路径加载。
 
-1. **下载 Skill 包：**
-   ```bash
-   # 下载 zip 包
-   curl -L https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip -o skill.zip
-   unzip skill.zip -d my-project/skills
+1. **浏览器下载 Skill 包到本地，解压到项目目录：**
+   - 访问下载链接：https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip
+   - 将下载的 zip 文件解压到项目目录，例如 `my-project/skills/contract-analyzer`
 
-   # 或克隆 v5 分支
-   git clone https://github.com/Memory555/contract-analyzer.git -b v5
-   cp -r contract-analyzer/skill my-project/skills/contract-analyzer
-   ```
+2. **在 AI 平台中指定本地路径安装：**
+   - **Codex**：`从本地 my-project/skills/contract-analyzer 目录安装 Skill`
+   - **Claude**：在 Project Settings → Skills 中添加本地路径：`/path/to/my-project/skills/contract-analyzer`
+   - **WorkBuddy**：`从本地 E:\my-project\skills\contract-analyzer 目录安装合同智能分析 Skill`
 
-2. **在项目中通过代码调用：**
-   ```javascript
-   const skill = require('./skills/contract-analyzer');
-   const result = await skill.analyze('合同.docx');
-   console.log(result.paymentPlan);  // 付款计划
-   console.log(result.warranty);     // 质保明细
-   console.log(result.issues);       // 合同问题
-   ```
-
-3. **或通过命令行运行（需配置 API Key）：**
-   ```bash
-   cd my-project/skills/contract-analyzer
-   npm install
-   export OPENAI_API_KEY="your-api-key"
-   node scripts/analyze.js --file 合同.docx --output 结果.md
-   ```
+3. **安装完成后，直接在对话中上传合同文件即可分析。**
 
 #### 工作原理
 

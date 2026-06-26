@@ -907,47 +907,46 @@
           </div>
         </div>
 
-        <!-- 安装方式 B：本地项目使用 -->
+        <!-- 安装方式 B：本地路径安装（仍为 AI 平台使用） -->
         <div class="intro-card" style="margin-top:16px;">
-          <div class="lead" style="font-size:1.05rem;margin-bottom:16px;"><strong>📂 安装方式 B：下载到本地项目中使用</strong></div>
-          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">适合开发者或需要离线使用的场景。下载 Skill 包到本地，通过代码调用或命令行运行。</p>
+          <div class="lead" style="font-size:1.05rem;margin-bottom:16px;"><strong>📂 安装方式 B：下载后从本地路径安装</strong></div>
+          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">适合网络受限或需要自定义 Skill 的场景。手动下载到本地，然后在 AI 平台中指定本地路径加载。</p>
 
           <div class="step-list">
             <div class="step-item">
               <div class="step-num">1</div>
               <div class="step-content">
-                <div class="step-text">下载 Skill 包到本地：</div>
-                <div class="code-block"><span class="comment"># 方式一：直接下载 zip</span>
-<span class="cmd">curl</span> <span class="arg">-L</span> https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip <span class="cmd">-o</span> skill.zip
-<span class="cmd">unzip</span> skill.zip <span class="cmd">-d</span> my-project/skills
-
-<span class="comment"># 方式二：克隆 v5 分支</span>
-<span class="cmd">git clone</span> https://github.com/Memory555/contract-analyzer.git <span class="cmd">-b</span> v5
-<span class="cmd">cp</span> <span class="arg">-r</span> contract-analyzer/skill my-project/skills/contract-analyzer</div>
+                <div class="step-text">浏览器下载 Skill 包到本地，解压到项目目录：</div>
+                <div style="margin-top:10px;font-size:0.85rem;color:var(--text-secondary);line-height:1.8;">
+                  <div>1. 访问 <a href="https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip" target="_blank" style="color:var(--primary);">下载链接</a>（或浏览器直接打开该地址）</div>
+                  <div>2. 将下载的 zip 文件解压到项目目录，例如：<span style="font-family:monospace;background:#f8fafc;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">my-project/skills/contract-analyzer</span></div>
+                </div>
               </div>
             </div>
             <div class="step-item">
               <div class="step-num">2</div>
               <div class="step-content">
-                <div class="step-text">在项目中配置并使用（Node.js 示例）：</div>
-                <div class="code-block"><span class="comment">// 加载 Skill 的分析逻辑</span>
-<span class="cmd">const</span> skill = <span class="cmd">require</span>(<span class="str">'./skills/contract-analyzer'</span>);
-
-<span class="comment">// 分析合同文件</span>
-<span class="cmd">const</span> result = <span class="cmd">await</span> skill.analyze(<span class="str">'合同.docx'</span>);
-<span class="cmd">console</span>.log(result.paymentPlan);   <span class="comment">// 付款计划</span>
-<span class="cmd">console</span>.log(result.warranty);      <span class="comment">// 质保明细</span>
-<span class="cmd">console</span>.log(result.issues);        <span class="comment">// 合同问题</span></div>
+                <div class="step-text">在 AI 平台中指定本地路径安装：</div>
+                <div style="margin-top:12px;">
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;">
+                    <div style="font-weight:600;font-size:0.92rem;margin-bottom:6px;color:var(--primary);">🔷 Codex</div>
+                    <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">在对话中输入：<span style="font-family:monospace;background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">从本地 my-project/skills/contract-analyzer 目录安装 Skill</span></div>
+                  </div>
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;">
+                    <div style="font-weight:600;font-size:0.92rem;margin-bottom:6px;color:var(--accent);">🟣 Claude（Anthropic）</div>
+                    <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">在 Project Settings → Skills 中添加本地路径：<span style="font-family:monospace;background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">/path/to/my-project/skills/contract-analyzer</span></div>
+                  </div>
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+                    <div style="font-weight:600;font-size:0.92rem;margin-bottom:6px;color:var(--warning);">🔶 WorkBuddy</div>
+                    <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">在对话中输入：<span style="font-family:monospace;background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">从本地 E:\my-project\skills\contract-analyzer 目录安装合同智能分析 Skill</span></div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="step-item">
               <div class="step-num">3</div>
               <div class="step-content">
-                <div class="step-text">或通过命令行直接运行（需配置 API Key）：</div>
-                <div class="code-block"><span class="cmd">cd</span> my-project/skills/contract-analyzer
-<span class="cmd">npm install</span>
-<span class="cmd">export</span> <span class="arg">OPENAI_API_KEY</span>=<span class="str">"your-api-key"</span>
-<span class="cmd">node</span> scripts/analyze.js <span class="arg">--file</span> 合同.docx <span class="arg">--output</span> 结果.md</div>
+                <div class="step-text">安装完成后，直接在对话中上传合同文件即可分析。</div>
               </div>
             </div>
           </div>
