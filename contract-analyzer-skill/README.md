@@ -2,12 +2,11 @@
 
 **轻量级合同分析工具，可直接在 AI 平台（Codex / Claude / WorkBuddy）中使用，无需配置 API Key。**
 
-## 三种使用方式
+## 两种使用方式
 
 | 方式 | 适用场景 | 是否需要安装 | 是否需要 API Key |
 |------|----------|------------|----------------|
 | **🤖 AI 平台 Skill**（推荐） | 日常使用 Codex / Claude / WorkBuddy | 一次安装 | ❌ 不需要 |
-| **💻 终端命令行** | 开发者、自动化脚本 | 需要 Node.js | ✅ 需要 |
 | **💬 直接对话上传** | 临时使用、任何 AI 对话 | 不需要 | ❌ 不需要 |
 
 ---
@@ -44,40 +43,7 @@
 
 ---
 
-## 方式二：终端命令行（CLI）
-
-适合开发者、自动化脚本或需要集成到 CI/CD 流水线的场景。需要自行配置 API Key。
-
-### 安装
-
-```bash
-# 下载
-npm install -g contract-analyzer-skill
-
-# 或克隆仓库
-# git clone https://github.com/Memory555/contract-analyzer.git -b v5
-# cd skill && npm install
-```
-
-### 使用
-
-```bash
-export OPENAI_API_KEY="your-api-key"
-export OPENAI_BASE_URL="https://api.openai.com/v1"  # 可选，自定义端点
-
-node scripts/analyze.js --file 合同.docx --output 结果.md
-```
-
-参数说明：
-- `--file`：合同文件路径（DOCX 格式）
-- `--output`：输出文件路径（默认 Markdown，可选 `.json` 输出原始结构化数据）
-- `--base-url`：自定义 API 端点（覆盖环境变量）
-
-支持平台：OpenAI、NVIDIA NIM、DeepSeek、阿里百炼等任何 OpenAI SDK 兼容接口。
-
----
-
-## 方式三：直接对话上传（零安装）
+## 方式二：直接对话上传（零安装）
 
 适合临时使用。直接在 ChatGPT、Claude、Gemini、Kimi 等任何支持文件上传的 AI 对话中：
 
@@ -99,24 +65,23 @@ node scripts/analyze.js --file 合同.docx --output 结果.md
 
 AI 直接读取文件并输出分析结果。**无需安装任何工具，无需配置 API Key。**
 
-> ⚠️ 局限性：直接对话方式依赖 AI 自身对文件的理解能力，结构化程度不如 Skill / CLI 版本稳定。
+> ⚠️ 局限性：直接对话方式依赖 AI 自身对文件的理解能力，结构化程度不如 Skill 版本稳定。
 
 ---
 
 ## 功能对比
 
-| 功能 | AI 平台 Skill | 终端 CLI | 直接对话 |
-|------|-------------|----------|----------|
-| 安装成本 | 一次安装 | 需要 Node.js | 无 |
-| API Key | ❌ 不需要 | ✅ 需要 | ❌ 不需要 |
-| 付款计划提取 | ✅ 完整 | ✅ 完整 | ⚠️ 依赖 AI |
-| 质保明细提取 | ✅ 完整 | ✅ 完整 | ⚠️ 依赖 AI |
-| 合同问题检查 | ✅ 三级分级 | ✅ 三级分级 | ⚠️ 不稳定 |
-| 比例校验 | ✅ 自动 | ✅ 自动 | ⚠️ 不稳定 |
-| 置信度标注 | ✅ 有 | ✅ 有 | ❌ 无 |
-| 批量处理 | ❌ 不支持 | ✅ 支持 | ❌ 不支持 |
-| 结构化 JSON 输出 | ✅ 支持 | ✅ 支持 | ❌ 不支持 |
-| 适用场景 | 日常分析 | 自动化/批量 | 临时快速查看 |
+| 功能 | AI 平台 Skill | 直接对话 |
+|------|-------------|----------|
+| 安装成本 | 一次安装 | 无 |
+| API Key | ❌ 不需要 | ❌ 不需要 |
+| 付款计划提取 | ✅ 完整 | ⚠️ 依赖 AI |
+| 质保明细提取 | ✅ 完整 | ⚠️ 依赖 AI |
+| 合同问题检查 | ✅ 三级分级 | ⚠️ 不稳定 |
+| 比例校验 | ✅ 自动 | ⚠️ 不稳定 |
+| 置信度标注 | ✅ 有 | ❌ 无 |
+| 结构化 JSON 输出 | ✅ 支持 | ❌ 不支持 |
+| 适用场景 | 日常分析 | 临时快速查看 |
 
 ---
 
@@ -131,7 +96,6 @@ AI 直接读取文件并输出分析结果。**无需安装任何工具，无需
 
 - **前端平台版本**：见 `docs/v5 合同智能分析平台.html`
 - **分析逻辑**：SKILL.md 中定义了完整的 Prompt 和 JSON Schema
-- **CLI 版本**：`scripts/analyze.js` 使用 mammoth.js 提取 DOCX + OpenAI SDK 分析
 - **文档解析**：浏览器端使用 mammoth.js，无需后端服务
 
 ---
