@@ -1,72 +1,139 @@
-# \u5408\u540c\u667a\u80fd\u5206\u6790 Skill
+# 合同智能分析 Skill
 
-## \u5feb\u901f\u5f00\u59cb
+**轻量级合同分析工具，可直接在 AI 平台（Codex / Claude / WorkBuddy）中使用，无需配置 API Key。**
 
-### 1. \u5b89\u88c5
+## 三种使用方式
+
+| 方式 | 适用场景 | 是否需要安装 | 是否需要 API Key |
+|------|----------|------------|----------------|
+| **🤖 AI 平台 Skill**（推荐） | 日常使用 Codex / Claude / WorkBuddy | 一次安装 | ❌ 不需要 |
+| **💻 终端命令行** | 开发者、自动化脚本 | 需要 Node.js | ✅ 需要 |
+| **💬 直接对话上传** | 临时使用、任何 AI 对话 | 不需要 | ❌ 不需要 |
+
+---
+
+## 方式一：AI 平台 Skill（推荐）
+
+适合在支持 Skill 扩展的 AI 工具中使用（Codex、Claude、WorkBuddy 等）。安装后，直接在对话中上传合同文件即可分析，**无需配置 API Key**（由 AI 平台统一提供模型能力）。
+
+### 安装方式 A：远程安装（推荐）
+
+直接在 AI 平台对话中发送安装指令，平台自动从 GitHub 拉取并集成 Skill：
+
+| 平台 | 指令 |
+|------|------|
+| **Codex** | `从 https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip 安装合同智能分析 Skill` |
+| **Claude** | 在 Project Settings → Skills 中添加 URL：`https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip` |
+| **WorkBuddy** | `从 https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip 安装合同智能分析 Skill` |
+
+安装完成后，直接在对话中上传合同文件：
+
+> **用户：** 分析这份合同，提取付款计划和质保条款 [上传 合同.docx]
+>
+> **AI：** 正在分析...
+
+### 安装方式 B：本地路径安装
+
+适合网络受限或需要自定义 Skill 的场景：
+
+1. 浏览器下载 [contract-analyzer-skill-v5.0.0.zip](https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip)，解压到项目目录（如 `my-project/skills/contract-analyzer`）
+2. 在 AI 平台中指定本地路径安装：
+   - **Codex**：`从本地 my-project/skills/contract-analyzer 目录安装 Skill`
+   - **Claude**：在 Project Settings → Skills 中添加本地路径
+   - **WorkBuddy**：`从本地 E:\my-project\skills\contract-analyzer 目录安装合同智能分析 Skill`
+
+---
+
+## 方式二：终端命令行（CLI）
+
+适合开发者、自动化脚本或需要集成到 CI/CD 流水线的场景。需要自行配置 API Key。
+
+### 安装
 
 ```bash
-# \u65b9\u5f0f\u4e00\uff1a\u4ece GitHub Releases \u4e0b\u8f7d
-curl -L https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill.zip -o skill.zip
-unzip skill.zip -d contract-analyzer-skill
+# 下载
+npm install -g contract-analyzer-skill
 
-# \u65b9\u5f0f\u4e8c\uff1a\u514b\u9686\u4ed3\u5e93\u540e\u76f4\u63a5\u4f7f\u7528
-git clone https://github.com/Memory555/contract-analyzer.git -b v5
-cd contract-analyzer/skill
+# 或克隆仓库
+# git clone https://github.com/Memory555/contract-analyzer.git -b v5
+# cd skill && npm install
 ```
 
-### 2. \u5b89\u88c5\u4f9d\u8d56
+### 使用
 
 ```bash
-npm install
-```
-
-### 3. \u4f7f\u7528
-
-```bash
-# \u65b9\u5f0f\u4e00\uff1a\u4f7f\u7528\u73af\u5883\u53d8\u91cf\u914d\u7f6e API Key
 export OPENAI_API_KEY="your-api-key"
-export OPENAI_BASE_URL="https://api.openai.com/v1"  # \u53ef\u9009\uff0c\u9ed8\u8ba4 OpenAI \u5b98\u65b9
-export MODEL="gpt-4.1-mini"  # \u53ef\u9009\uff0c\u9ed8\u8ba4\u4f7f\u7528\u6b64\u6a21\u578b
+export OPENAI_BASE_URL="https://api.openai.com/v1"  # 可选，自定义端点
 
-node scripts/analyze.js --file \u5408\u540c.docx
-
-# \u65b9\u5f0f\u4e8c\uff1a\u547d\u4ee4\u884c\u53c2\u6570\u76f4\u63a5\u4f20\u5165
-node scripts/analyze.js --file \u5408\u540c.docx --api-key your-api-key --base-url https://api.openai.com/v1 --model gpt-4.1-mini
-
-# \u65b9\u5f0f\u4e09\uff1a\u8f93\u51fa\u5230\u6587\u4ef6
-node scripts/analyze.js --file \u5408\u540c.docx --output \u5206\u6790\u7ed3\u679c.md
+node scripts/analyze.js --file 合同.docx --output 结果.md
 ```
 
-## \u652f\u6301\u7684 AI \u5e73\u53f0
+参数说明：
+- `--file`：合同文件路径（DOCX 格式）
+- `--output`：输出文件路径（默认 Markdown，可选 `.json` 输出原始结构化数据）
+- `--base-url`：自定义 API 端点（覆盖环境变量）
 
-| \u5e73\u53f0 | Base URL \u793a\u4f8b | \u8bf4\u660e |
-|--------|------------------|------|
-| OpenAI | `https://api.openai.com/v1` | \u5b98\u65b9\u63a5\u53e3 |
-| NVIDIA NIM | `https://integrate.api.nvidia.com/v1` | \u9700\u8981 NVIDIA API Key |
-| DeepSeek | `https://api.deepseek.com/v1` | DeepSeek \u5b98\u65b9 |
-| \u963f\u91cc\u767e\u70bc | `https://dashscope.aliyuncs.com/compatible-mode/v1` | \u901a\u4e49\u5343\u95ee\u7b49 |
-| \u81ea\u5b9a\u4e49 | \u4efb\u4f55 OpenAI-compatible \u670d\u52a1 | \u5982 vLLM\u3001Ollama \u7b49 |
+支持平台：OpenAI、NVIDIA NIM、DeepSeek、阿里百炼等任何 OpenAI SDK 兼容接口。
 
-## \u8f93\u51fa\u683c\u5f0f
+---
 
-\u9ed8\u8ba4\u8f93\u51fa\u4e3a Markdown \u683c\u5f0f\u7684\u5206\u6790\u62a5\u544a\uff0c\u5305\u542b\u4ee5\u4e0b\u90e8\u5206\uff1a
+## 方式三：直接对话上传（零安装）
 
-- **\u6574\u4f53\u7f6e\u4fe1\u5ea6**\uff1aAI \u5bf9\u5206\u6790\u7ed3\u679c\u7684\u7f6e\u4fe1\u7a0b\u5ea6\u8bc4\u5206
-- **\u4ed8\u6b3e\u8ba1\u5212**\uff1a\u9636\u6bb5\u3001\u6bd4\u4f8b\u3001\u89e6\u53d1\u6761\u4ef6\u3001\u65f6\u9650\u3001\u5907\u6ce8
-- **\u8d28\u4fdd\u660e\u7ec6**\uff1a\u8d28\u4fdd\u671f\u3001\u54cd\u5e94\u65f6\u6548\u3001\u8fdd\u7ea6\u91d1\u3001\u670d\u52a1\u8303\u56f4\u7b49
-- **\u5408\u540c\u95ee\u9898**\uff1a\u6761\u6b3e\u77db\u76fe\u3001\u6570\u503c\u7f3a\u5931\u3001\u903b\u8f91\u51b2\u7a81\u3001\u5b9a\u4e49\u6a21\u7cca
+适合临时使用。直接在 ChatGPT、Claude、Gemini、Kimi 等任何支持文件上传的 AI 对话中：
 
-## \u5e38\u89c1\u95ee\u9898
+1. 上传 DOCX 合同文件
+2. 粘贴以下提示词：
 
-### Q: \u4e3a\u4ec0\u4e48\u53ea\u652f\u6301 DOCX\uff1f
-A: \u5f53\u524d\u7248\u672c\u4e3b\u8981\u9488\u5bf9 DOCX \u683c\u5f0f\u7684\u7535\u5b50\u5408\u540c\u6587\u4ef6\u3002PDF \u548c\u626b\u63cf\u4ef6\u9700\u8981\u989d\u5916\u7684 OCR \u5904\u7406\uff0c\u53ef\u4ee5\u7528\u5176\u4ed6\u5de5\u5177\u5148\u5c06 PDF \u8f6c\u6362\u4e3a DOCX\u3002
+```
+请分析这份合同，提取以下结构化信息，以 Markdown 表格输出：
 
-### Q: \u5206\u6790\u7ed3\u679c\u4e0d\u51c6\u786e\u600e\u4e48\u529e\uff1f
-A: \u7ed3\u679c\u4ec5\u4f9b\u53c2\u8003\uff0c\u5efa\u8bae\u59cb\u7ec8\u4ee5\u5408\u540c\u539f\u6587\u4e3a\u51c6\u3002\u53ef\u4ee5\u5c1d\u8bd5\u66f4\u6362\u66f4\u5f3a\u5927\u7684\u6a21\u578b\uff08\u5982 GPT-4o\uff09\u63d0\u5347\u51c6\u786e\u6027\u3002
+1. 付款计划：阶段、名称、比例、触发条件、时限、备注
+2. 质保明细：质保期、响应时效、违约金、服务范围、质保期起算日、质保金退还条件、质保范围排除项
+3. 合同问题：检查条款矛盾、数值缺失、逻辑冲突、定义模糊，按 ERROR / WARNING / INFO 分级
 
-### Q: \u652f\u6301\u6279\u91cf\u5206\u6790\u5417\uff1f
-A: \u5f53\u524d Skill \u7248\u672c\u4e13\u4e3a\u5355\u4efd\u5408\u540c\u5feb\u901f\u5206\u6790\u8bbe\u8ba1\u3002\u5982\u9700\u6279\u91cf\u5904\u7406\uff0c\u8bf7\u4f7f\u7528\u5e73\u53f0\u7248\u672c\u3002
+注意：
+- 比例总和应为 100%，如果不符请标注
+- 质保期如有多种表述（如"3年"和"验收后1年"），请指出矛盾
+- 输出格式：Markdown 表格 + 问题列表
+```
 
-## License
+AI 直接读取文件并输出分析结果。**无需安装任何工具，无需配置 API Key。**
 
-MIT
+> ⚠️ 局限性：直接对话方式依赖 AI 自身对文件的理解能力，结构化程度不如 Skill / CLI 版本稳定。
+
+---
+
+## 功能对比
+
+| 功能 | AI 平台 Skill | 终端 CLI | 直接对话 |
+|------|-------------|----------|----------|
+| 安装成本 | 一次安装 | 需要 Node.js | 无 |
+| API Key | ❌ 不需要 | ✅ 需要 | ❌ 不需要 |
+| 付款计划提取 | ✅ 完整 | ✅ 完整 | ⚠️ 依赖 AI |
+| 质保明细提取 | ✅ 完整 | ✅ 完整 | ⚠️ 依赖 AI |
+| 合同问题检查 | ✅ 三级分级 | ✅ 三级分级 | ⚠️ 不稳定 |
+| 比例校验 | ✅ 自动 | ✅ 自动 | ⚠️ 不稳定 |
+| 置信度标注 | ✅ 有 | ✅ 有 | ❌ 无 |
+| 批量处理 | ❌ 不支持 | ✅ 支持 | ❌ 不支持 |
+| 结构化 JSON 输出 | ✅ 支持 | ✅ 支持 | ❌ 不支持 |
+| 适用场景 | 日常分析 | 自动化/批量 | 临时快速查看 |
+
+---
+
+## 下载
+
+- **Skill 安装包**：`https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip`
+- **完整项目**：`https://github.com/Memory555/contract-analyzer/tree/v5`
+
+---
+
+## 技术说明
+
+- **前端平台版本**：见 `docs/v5 合同智能分析平台.html`
+- **分析逻辑**：SKILL.md 中定义了完整的 Prompt 和 JSON Schema
+- **CLI 版本**：`scripts/analyze.js` 使用 mammoth.js 提取 DOCX + OpenAI SDK 分析
+- **文档解析**：浏览器端使用 mammoth.js，无需后端服务
+
+---
+
+*免责声明：AI 分析结果仅供参考，不构成法律意见。关键合同条款请交由专业法务人员审核。*

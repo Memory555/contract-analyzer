@@ -1,205 +1,147 @@
 ---
-title: "合同智能分析 Skill"
-description: "快速分析 DOCX 合同文件，提取付款计划、质保明细和合同问题。适用于偶尔分析 1-2 份合同、快速看看付款和质保条款的场景。"
 agent_created: true
+name: contract-analyzer
+version: 1.0.0
+description: 智能合同分析助手，从 DOCX 合同文件中提取付款计划、质保明细、发现合同问题
 ---
 
 # 合同智能分析 Skill
 
-## 能力
+## 功能描述
 
-这是一个轻量级的合同分析能力包，可以在多种环境中使用，用于快速分析单份 DOCX 合同文件。
+当用户上传 DOCX 格式合同文件时，自动分析并提取：
 
-### 支持的分析内容
-- **付款计划**：阶段、比例、触发条件、时限、备注
-- **质保明细**：质保期、响应时效、违约金、服务范围等
-- **合同问题**：条款矛盾、数值缺失、逻辑冲突、定义模糊（三级严重程度：error / warning / info）
+1. **付款计划** — 各阶段名称、付款比例、触发条件、付款时限、备注
+2. **质保明细** — 质保期、响应时效、违约金、服务范围、起算日、退还条件、排除项
+3. **合同问题** — 条款矛盾、数值缺失、逻辑冲突、定义模糊，按 ERROR / WARNING / INFO 分级
 
-### 输出形式
-- 人类可读的 Markdown 报告（表格 + 列表格式）
-- 可选原始 JSON 输出，便于嵌入其他自动化流程
+## 触发条件
+
+- 用户上传 `.docx` 文件并提及"合同"、"分析"、"审查"等关键词
+- 用户明确请求："分析这份合同"、"提取付款计划"、"检查质保条款"等
+- 用户上传文件后直接说："看看这个"
+
+## 工作流
+
+### 步骤 1：读取文件内容
+
+- 使用 `read_file` 或平台内置文件读取能力获取 DOCX 纯文本内容
+- 若平台不支持直接读取 DOCX，提示用户粘贴文本或提取后上传
+
+### 步骤 2：结构化分析
+
+使用以下系统提示词进行分析，要求 AI 以结构化 JSON 输出：
+
+```
+你是一个合同审查专家。请对以下合同文本进行深度分析，提取结构化信息。
+
+分析维度：
+1. 付款计划：提取所有付款阶段，包含阶段序号、名称、付款比例、触发条件、付款时限、备注
+2. 质保明细：提取质保条款，包含质保期、响应时效、违约金、服务范围、质保期起算日、质保金退还条件、质保范围排除项
+3. 合同问题：检查以下问题并按严重程度分级：
+   - ERROR（严重）：条款矛盾、数值冲突、法律风险
+   - WARNING（警告）：数值缺失、表述模糊、条件遗漏
+   - INFO（提示）：建议补充、参考条款、优化建议
+
+校验规则：
+- 所有付款比例之和必须等于 100%，否则标记为 WARNING
+- 质保期如有多种表述（如"3年"和"验收后1年"），标记为 ERROR
+- 触发条件如包含"以甲方确认为准"等主观条款，标记为 WARNING
+
+输出格式：严格按照以下 JSON Schema
+{
+  "paymentPlan": [{
+    "stage": "string",
+    "name": "string",
+    "ratio": "number (0-1)",
+    "trigger": "string",
+    "deadline": "string",
+    "notes": "string"
+  }],
+  "warranty": {
+    "period": "string",
+    "responseTime": "string",
+    "penalty": "string",
+    "scope": "string",
+    "startDate": "string",
+    "refundCondition": "string",
+    "exclusions": "string"
+  },
+  "issues": [{
+    "severity": "ERROR | WARNING | INFO",
+    "category": "string (条款矛盾/数值缺失/逻辑冲突/定义模糊/其他)",
+    "description": "string",
+    "location": "string (条款编号)",
+    "suggestion": "string"
+  }],
+  "confidence": "HIGH | MEDIUM | LOW"
+}
+```
+
+### 步骤 3：生成 Markdown 报告
+
+将 JSON 结果转换为以下 Markdown 格式输出：
+
+```markdown
+# 合同分析报告
+
+**文件：** [文件名]
+**分析置信度：** HIGH / MEDIUM / LOW
+**总体评估：** [一句话总结]
 
 ---
 
-## 使用方式
+## 一、付款计划
 
-本 Skill 提供三种使用方式，按适用场景选择：
+| 阶段 | 名称 | 比例 | 触发条件 | 时限 | 备注 |
+|------|------|------|----------|------|------|
+| 1 | [名称] | [比例] | [触发条件] | [时限] | [备注] |
 
-| 方式 | 适用场景 | 是否需要配置 API | 是否需要安装 |
-|------|----------|------------------|-------------|
-| **AI 平台 Skill** | 日常使用 Codex / Claude / WorkBuddy | ❌ 不需要 | 一次安装 |
-| **终端命令行（CLI）** | 开发者、自动化脚本、CI/CD | ✅ 需要自行配置 | 需要 Node.js |
-| **直接对话上传** | 临时使用、快速查看 | ❌ 不需要 | 不需要 |
-
-### 方式一：AI 平台 Skill（推荐）
-
-适合在支持 Skill 扩展的 AI 工具中使用（如 Codex、Claude、WorkBuddy 等）。
-
-**优势：** 无需配置 API Key，由 AI 平台统一提供模型能力。
-
-#### 安装方式 A：AI 平台直接安装（推荐）
-
-无需下载任何文件。直接在 AI 平台对话中发送安装指令，平台自动从 GitHub 拉取并集成 Skill。
-
-| 平台 | 安装指令 |
-|------|----------|
-| **Codex** | `从 https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip 安装合同智能分析 Skill` |
-| **Claude** | 在 Project Settings → Skills 中添加 URL：`https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip` |
-| **WorkBuddy** | `从 https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip 安装合同智能分析 Skill` |
-
-安装完成后，直接在对话中上传合同文件即可分析：
-
-> **用户：** 分析这份合同，提取付款计划和质保条款 [上传 合同.docx]
->
-> **AI：** 正在分析合同...
->
-> 📊 **付款计划**
-> | 阶段 | 名称 | 比例 | 触发条件 | 时限 |
-> | 第一阶段 | 预付款 | 30% | 合同签订后 | 5个工作日 |
-> ...
->
-> 🔧 **质保明细**
-> ...
->
-> ⚠️ **发现 1 个问题**
-> 【ERROR】条款矛盾：...
-
-#### 安装方式 B：下载后从本地路径安装
-
-适合网络受限或需要自定义 Skill 的场景。手动下载到本地，然后在 AI 平台中指定本地路径加载。
-
-1. **浏览器下载 Skill 包到本地，解压到项目目录：**
-   - 访问下载链接：https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip
-   - 将下载的 zip 文件解压到项目目录，例如 `my-project/skills/contract-analyzer`
-
-2. **在 AI 平台中指定本地路径安装：**
-   - **Codex**：`从本地 my-project/skills/contract-analyzer 目录安装 Skill`
-   - **Claude**：在 Project Settings → Skills 中添加本地路径：`/path/to/my-project/skills/contract-analyzer`
-   - **WorkBuddy**：`从本地 E:\my-project\skills\contract-analyzer 目录安装合同智能分析 Skill`
-
-3. **安装完成后，直接在对话中上传合同文件即可分析。**
-
-#### 工作原理
-
-Skill 中包含完整的分析 Prompt 和 JSON Schema 定义。AI 平台使用自身内置的模型能力执行分析，无需用户配置 API Key。分析逻辑与平台版本（v4）完全一致。
+⚠️ 校验：付款比例合计 [X]%，[正常/异常说明]
 
 ---
 
-### 方式二：终端命令行（CLI）
+## 二、质保明细
 
-适合开发者、自动化脚本或需要集成到 CI/CD 流水线的场景。
-
-#### 安装
-
-```bash
-# 从 GitHub Releases 下载
-curl -L https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip -o skill.zip
-unzip skill.zip -d contract-analyzer-skill
-
-# 或克隆仓库
-git clone https://github.com/Memory555/contract-analyzer.git -b v5
-cd contract-analyzer/skill
-
-# 安装依赖
-npm install
-```
-
-#### 使用
-
-```bash
-# 方式一：环境变量（推荐）
-export OPENAI_API_KEY="your-api-key"
-export OPENAI_BASE_URL="https://api.openai.com/v1"  # 可选
-export MODEL="gpt-4.1-mini"  # 可选
-node scripts/analyze.js --file 合同.docx
-
-# 方式二：命令行传入
-node scripts/analyze.js --file 合同.docx --api-key sk-xxx --base-url https://api.deepseek.com/v1
-
-# 输出到文件
-node scripts/analyze.js --file 合同.docx --output 分析报告.md
-
-# 输出 JSON
-node scripts/analyze.js --file 合同.docx --json
-```
-
-#### 支持的 AI 平台
-
-| 平台 | Base URL |
-|------|----------|
-| OpenAI | `https://api.openai.com/v1` |
-| NVIDIA NIM | `https://integrate.api.nvidia.com/v1` |
-| DeepSeek | `https://api.deepseek.com/v1` |
-| 阿里百炼 | `https://dashscope.aliyuncs.com/compatible-mode/v1` |
-| 自定义 | 任何 OpenAI-compatible 服务 |
+| 项目 | 内容 |
+|------|------|
+| 质保期 | [内容] |
+| 响应时效 | [内容] |
+| 违约金 | [内容] |
+| 服务范围 | [内容] |
+| 起算日 | [内容] |
+| 退还条件 | [内容] |
+| 排除项 | [内容] |
 
 ---
 
-### 方式三：直接对话上传（最简）
+## 三、合同问题
 
-适合临时使用，无需安装任何工具。
+### 严重问题（ERROR）
+- **[分类]** [描述]（条款 [位置]）→ [建议]
 
-在任何支持文件上传的 AI 对话中（ChatGPT、Claude、Gemini、Kimi 等），直接上传 DOCX 文件并粘贴以下提示词：
+### 警告（WARNING）
+- **[分类]** [描述]（条款 [位置]）→ [建议]
 
-```
-请分析这份合同，提取以下结构化信息，以 Markdown 表格输出：
-
-1. 付款计划：阶段、名称、比例、触发条件、时限、备注
-2. 质保明细：质保期、响应时效、违约金、服务范围、质保期起算日、质保金退还条件、质保范围排除项
-3. 合同问题：检查条款矛盾、数值缺失、逻辑冲突、定义模糊，按 ERROR / WARNING / INFO 分级
-
-注意：
-- 比例总和应为 100%，如果不符请标注
-- 质保期如有多种表述（如"3年"和"验收后1年"），请指出矛盾
-- 输出格式：Markdown 表格 + 问题列表
-```
-
-**局限性：** 依赖 AI 自身对文件的理解能力，结构化程度不如 Skill / CLI 版本稳定。
+### 提示（INFO）
+- **[分类]** [描述]（条款 [位置]）→ [建议]
 
 ---
 
-## 工作流程
-
-```
-DOCX 文件
-    ↓
-mammoth.js 提取纯文本（保留段落结构）
-    ↓
-OpenAI Responses API + JSON Schema 结构化输出
-    ↓
-Markdown 报告 / JSON 结果
+> 免责声明：本分析由 AI 辅助生成，仅供参考，不构成法律意见。关键条款请交由法务人员审核。
 ```
 
-## 技术栈
+## 输出要求
 
-- **文档解析**：[mammoth](https://github.com/mwilliamson/mammoth.js) - 纯组语级别的 DOCX 文本提取，保留段落结构
-- **AI 调用**：[OpenAI SDK](https://github.com/openai/openai-node) - 支持任何 OpenAI-compatible 服务
-- **结构化输出**：JSON Schema + Responses API - 稳定的结构化抽取，避免模型幻觉
-- **输出格式**：Markdown 报告 - 人类可读，支持在对话中展示
+- 付款比例使用百分比（如 30%）而非小数
+- 时限统一用"X个工作日/月/年"格式
+- 问题描述必须引用具体条款编号
+- 置信度为 LOW 时，需在报告中明确说明不确定之处
+- 保持客观中立，不做过分解读
 
-## 与平台版本的区别
+## 边界处理
 
-| | 平台版本 (v4) | Skill 版本 (v5) |
-|---|---|---|
-| 交互方式 | Web 界面 | CLI / AI 对话 / 直接对话 |
-| 批量分析 | 支持（最多 20 份） | 不支持（单份） |
-| 历史记录 | 本地 IndexedDB + 云端 PostgreSQL | 无（临时分析） |
-| Excel 导出 | 多 Sheet 批量汇总 | 不支持（仅文本报告） |
-| 反馈管理 | 云端存储 | 无 |
-| API 配置 | Web 界面配置一次 | CLI 需配置 / AI 平台无需配置 |
-| 应用场景 | 对外服务、团队协作 | 个人快速分析、嵌入 AI 工作流 |
-
-## 免责声明
-
-本分析结果仅供参考，不构成法律意见。请始终以合同原文为准。
-
-## 下载
-
-- **GitHub 仓库**：https://github.com/Memory555/contract-analyzer
-- **Releases 下载**：https://github.com/Memory555/contract-analyzer/releases
-- **当前版本**：v5.0.0
-- **Skill 下载**：https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip
-
-## License
-
-MIT
+- 如合同无质保条款，在质保明细中标注"未找到质保条款"
+- 如付款比例合计不为 100%，在问题和付款计划中同时标注
+- 如检测到多个版本/修订痕迹，以最新版本为准并提示用户
+- 如文件内容无法解析（加密/损坏），提示用户重新上传
