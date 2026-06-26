@@ -668,6 +668,7 @@
   <div class="nav-tab" data-tab="tech"><span class="tab-icon">🧱</span>技术栈</div>
   <div class="nav-tab" data-tab="deploy"><span class="tab-icon">☁️</span>部署平台</div>
   <div class="nav-tab" data-tab="limits"><span class="tab-icon">⚠️</span>当前限制</div>
+  <div class="nav-tab" data-tab="qiqi"><span class="tab-icon">🔗</span>企企集成判断</div>
   <div class="nav-tab" data-tab="verify"><span class="tab-icon">✅</span>验证步骤</div>
 </div>
 
@@ -1171,7 +1172,51 @@
     </div>
   </div>
 
-  <!-- Section 6: Verify -->
+  <!-- Section 6: Qiqi Integration Decision -->
+  <div class="section" id="sec-qiqi">
+    <div class="section-title"><div class="icon">🔗</div> 企企集成判断</div>
+
+    <div class="intro-card">
+      <div class="lead">结合企企合同新增页面的实际录入方式，暂不进行“先在企企保存合同，再由本平台拉取附件、解析并回写”的流程。原因是企企保存前通常已经要求填写合同编号、供应商、项目、日期、金额、明细等必填项，业务人员为了保存附件，仍然需要先人工完成大量录入。</div>
+    </div>
+
+    <div class="limit-section">
+      <h3><span class="severity-dot severity-medium"></span> 为什么会多一圈</h3>
+      <div class="step-list">
+        <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-text">业务人员进入企企新增合同页面，上传合同附件。</div></div></div>
+        <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-text">为了保存合同，仍需先人工填写企企要求的必填字段。</div></div></div>
+        <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-text">保存后，本平台再拉取附件并解析，随后还要回写或人工对照修改企企字段。</div></div></div>
+      </div>
+      <div class="warning-box" style="margin-top:16px;"><div class="warn-icon">⚠️</div><div>这条链路技术上可行，但没有解决“保存前就要录入字段”的核心痛点，反而增加跨系统切换和重复确认。</div></div>
+    </div>
+
+    <div class="limit-section">
+      <h3><span class="severity-dot severity-low"></span> 更优方向：在企企页面内增加合同解析</h3>
+      <table class="styled-table">
+        <thead><tr><th>环节</th><th>理想动作</th><th>价值</th></tr></thead>
+        <tbody>
+          <tr><td>上传附件</td><td>业务人员在企企新增合同页面上传合同文件</td><td>保持原有工作入口</td></tr>
+          <tr><td>触发解析</td><td>点击“合同解析”或“生成付款计划”</td><td>在保存前生成字段草稿</td></tr>
+          <tr><td>自动回填</td><td>回填基础信息、合同标的明细、付款计划明细</td><td>减少人工录入</td></tr>
+          <tr><td>人工校对</td><td>业务人员只确认低置信度字段和关键金额日期</td><td>保留业务控制权</td></tr>
+          <tr><td>保存提交</td><td>确认后在企企内保存或提交审批</td><td>形成顺滑闭环</td></tr>
+        </tbody>
+      </table>
+      <div class="note-box"><div class="note-icon">💡</div><div>该方向需要企企平台人员配合，在页面中增加解析入口、读取当前上传附件、调用合同智能分析服务，并允许把返回结果回填到当前表单。</div></div>
+    </div>
+
+    <div class="limit-section">
+      <h3><span class="severity-dot severity-low"></span> 当前平台的阶段定位</h3>
+      <div class="func-limit-list">
+        <div class="func-limit-item"><div class="fl-icon">📄</div><div><div class="fl-title">字段提取辅助</div><div class="fl-desc">在企企页面解析能力上线前，先上传合同文件，提取供应商、金额、日期、税率、付款计划等字段。</div></div></div>
+        <div class="func-limit-item"><div class="fl-icon">🧾</div><div><div class="fl-title">付款计划识别</div><div class="fl-desc">辅助拆分预付款、到货款、验收款、质保金等节点，减少业务人员逐条阅读合同条款的时间。</div></div></div>
+        <div class="func-limit-item"><div class="fl-icon">⚠️</div><div><div class="fl-title">录入前检查</div><div class="fl-desc">提前发现付款比例合计、关键日期、金额、质保条款等潜在问题，避免带着问题进入企企审批。</div></div></div>
+        <div class="func-limit-item"><div class="fl-icon">🧩</div><div><div class="fl-title">为企企内嵌能力沉淀规则</div><div class="fl-desc">先沉淀字段结构、提示规则和付款计划识别逻辑，后续再迁入企企页面形成真正闭环。</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 7: Verify -->
   <div class="section" id="sec-verify">
     <div class="section-title"><div class="icon">✅</div> 快速验证步骤</div>
 
@@ -1258,6 +1303,7 @@
     tech: document.getElementById('sec-tech'),
     deploy: document.getElementById('sec-deploy'),
     limits: document.getElementById('sec-limits'),
+    qiqi: document.getElementById('sec-qiqi'),
     verify: document.getElementById('sec-verify'),
   };
 
