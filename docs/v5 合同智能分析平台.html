@@ -511,7 +511,8 @@
     font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
     font-size: 0.85rem;
     line-height: 1.7;
-    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
     margin: 16px 0;
   }
   .code-block .comment { color: #94a3b8; }
@@ -998,7 +999,7 @@
             <div class="step-num">2</div>
             <div class="step-content">
               <div class="step-text">上传 DOCX 合同文件，并粘贴以下提示词：</div>
-              <div class="code-block" style="white-space:pre-wrap;"><span class="comment"># 通用提示词（可复制到任何 AI 对话中）</span>
+              <div class="code-block"><span class="comment"># 通用提示词（可复制到任何 AI 对话中）</span>
 
 请分析这份合同，提取以下结构化信息，以 Markdown 表格输出：
 
@@ -1069,7 +1070,7 @@
     <!-- 输出示例 -->
     <div class="intro-card">
       <div class="lead"><strong>📋 输出示例</strong></div>
-      <div class="code-block" style="white-space:pre-wrap;max-height:400px;overflow-y:auto;"># 合同分析结果
+      <div class="code-block" style="max-height:400px;overflow-y:auto;"># 合同分析结果
 
 **文件：** 采购合同.docx
 **分析时间：** 2026/6/26 12:00:00
