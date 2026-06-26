@@ -855,59 +855,123 @@
           </div>
         </div>
 
-        <div class="step-list" style="margin-top:20px;">
-          <div class="step-item">
-            <div class="step-num">1</div>
-            <div class="step-content">
-              <div class="step-text">在 AI 平台中安装 Skill：</div>
-              <div class="code-block"><span class="comment"># Codex / Claude 中</span>
-<span class="prompt">用户：</span>安装合同智能分析 Skill
-<span class="response">AI：</span>好的，请提供 Skill 的安装链接或文件。
+        <!-- 安装方式 A：下载安装 -->
+        <div class="intro-card" style="margin-top:20px;">
+          <div class="lead" style="font-size:1.05rem;margin-bottom:16px;"><strong>📥 安装方式 A：从 GitHub Releases 下载安装</strong> <span class="badge badge-success" style="margin-left:8px;font-size:0.75rem;">推荐</span></div>
+          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">适合大多数用户。下载打包好的 Skill 包，在 AI 平台中安装即可。</p>
 
-<span class="comment"># 直接提供 GitHub 链接</span>
-<span class="prompt">用户：</span>从 https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip 安装
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <div class="step-text">下载 Skill 安装包：</div>
+                <div class="code-block"><span class="comment"># 方式一：直接下载</span>
+<span class="cmd">curl</span> <span class="arg">-L</span> https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip <span class="cmd">-o</span> skill.zip
 
-<span class="comment"># 或提供本地 skill/ 目录路径</span>
-<span class="prompt">用户：</span>从本地 E:\contract-analyzer\skill 目录安装</div>
-            </div>
-          </div>
-          <div class="step-item">
-            <div class="step-num">2</div>
-            <div class="step-content">
-              <div class="step-text">在对话中直接上传合同文件，AI 自动调用 Skill 分析：</div>
-              <div class="chat-bubble user">
-                <div class="label">👤 用户</div>
-                请分析这份合同，提取付款计划和质保条款 [上传 合同.docx]
+<span class="comment"># 方式二：浏览器访问下载</span>
+<span class="str">https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip</span></div>
               </div>
-              <div class="chat-bubble ai">
-                <div class="label">🤖 AI（已加载 Skill）</div>
-                好的，正在分析合同...
-
-                📊 <strong>付款计划</strong>
-                | 阶段 | 名称 | 比例 | 触发条件 | 时限 |
-                | 第一阶段 | 预付款 | 30% | 合同签订后 | 5个工作日 |
-                | 第二阶段 | 验收款 | 65% | 系统验收合格 | 15个工作日 |
-                | 第三阶段 | 质保金 | 5% | 质保期满 | 10个工作日 |
-
-                🔧 <strong>质保明细</strong>
-                | 质保期 | 验收合格之日起 1 年 |
-                | 响应时效 | 重大故障 0.5h 响应，3h 解决 |
-
-                ⚠️ <strong>发现 1 个问题</strong>
-                【ERROR】条款矛盾：第5条写质保期 3 年，第7条写 1 年
+            </div>
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <div class="step-text">在 AI 平台中安装 Skill。根据你使用的平台选择对应方式：</div>
+                <div style="margin-top:12px;">
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;">
+                    <div style="font-weight:600;font-size:0.92rem;margin-bottom:6px;color:var(--primary);">🔷 Codex（OpenAI）</div>
+                    <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">在对话中输入：<span style="font-family:monospace;background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">安装 Skill，从 https://github.com/.../contract-analyzer-skill-v5.0.0.zip</span></div>
+                  </div>
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;">
+                    <div style="font-weight:600;font-size:0.92rem;margin-bottom:6px;color:var(--accent);">🟣 Claude（Anthropic）</div>
+                    <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">在 Project Settings 或对话中通过 MCP / Skill 机制加载 zip 文件</div>
+                  </div>
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+                    <div style="font-weight:600;font-size:0.92rem;margin-bottom:6px;color:var(--warning);">🔶 WorkBuddy</div>
+                    <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">在对话中输入：<span style="font-family:monospace;background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">从本地 skill.zip 安装合同智能分析 Skill</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <div class="step-text">确认安装成功，开始分析合同：</div>
+                <div class="chat-bubble user" style="margin-top:10px;">
+                  <div class="label">👤 用户</div>
+                  请分析这份合同，提取付款计划和质保条款 [上传 合同.docx]
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="info-box">
-          <div class="info-icon">ℹ️</div>
-          <div><strong>工作原理：</strong>Skill 中包含完整的分析 Prompt 和 JSON Schema 定义。AI 平台使用自身内置的模型能力执行分析，无需用户配置 API Key。分析逻辑与平台版本（v4）完全一致。</div>
+        <!-- 安装方式 B：本地路径安装 -->
+        <div class="intro-card" style="margin-top:16px;">
+          <div class="lead" style="font-size:1.05rem;margin-bottom:16px;"><strong>📂 安装方式 B：本地项目路径安装</strong></div>
+          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">适合已有项目代码的用户。直接指定 skill 目录路径，无需额外下载。</p>
+
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <div class="step-text">确保项目 v5 分支已克隆到本地，skill 目录存在：</div>
+                <div class="code-block"><span class="cmd">git clone</span> https://github.com/Memory555/contract-analyzer.git <span class="cmd">-b</span> v5
+<span class="cmd">ls</span> contract-analyzer/skill/SKILL.md  <span class="comment"># 确认文件存在</span></div>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <div class="step-text">在 AI 平台中指定本地路径安装：</div>
+                <div style="margin-top:12px;">
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;">
+                    <div style="font-weight:600;font-size:0.92rem;margin-bottom:6px;color:var(--primary);">🔷 Codex</div>
+                    <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">在对话中输入：<span style="font-family:monospace;background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">从本地 /path/to/contract-analyzer/skill 目录安装 Skill</span></div>
+                  </div>
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;">
+                    <div style="font-weight:600;font-size:0.92rem;margin-bottom:6px;color:var(--accent);">🟣 Claude</div>
+                    <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">在 Project Settings 中添加本地 skill 目录作为 MCP Server 或 Skill 源</div>
+                  </div>
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+                    <div style="font-weight:600;font-size:0.92rem;margin-bottom:6px;color:var(--warning);">🔶 WorkBuddy</div>
+                    <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">在对话中输入：<span style="font-family:monospace;background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">从本地 E:\contract-analyzer\skill 目录安装合同智能分析 Skill</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <div class="step-text">安装完成后，直接上传合同文件即可分析。</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="note-box">
-          <div class="note-icon">💡</div>
-          <div><strong>下载安装包：</strong>Skill 安装包与 CLI 版本共用同一分发包：<a href="https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill-v5.0.0.zip" target="_blank" style="color:var(--primary);">contract-analyzer-skill-v5.0.0.zip</a></div>
+        <!-- 使用示例 -->
+        <div class="intro-card" style="margin-top:16px;">
+          <div class="lead" style="font-size:1.05rem;margin-bottom:16px;"><strong>💬 使用示例</strong></div>
+          <div class="chat-bubble user">
+            <div class="label">👤 用户</div>
+            请分析这份采购合同，重点关注付款条款和质保条款。 [上传 采购合同.docx]
+          </div>
+          <div class="chat-bubble ai" style="margin-top:10px;">
+            <div class="label">🤖 AI（已加载 合同智能分析 Skill）</div>
+            好的，正在分析合同...
+
+            📊 <strong>付款计划</strong>
+            | 阶段 | 名称 | 比例 | 触发条件 | 时限 |
+            | 第一阶段 | 预付款 | 30% | 合同签订后 | 5个工作日 |
+            | 第二阶段 | 验收款 | 65% | 系统验收合格 | 15个工作日 |
+            | 第三阶段 | 质保金 | 5% | 质保期满 | 10个工作日 |
+
+            🔧 <strong>质保明细</strong>
+            | 质保期 | 验收合格之日起 1 年 |
+            | 响应时效 | 重大故障 0.5h 响应，3h 解决 |
+
+            ⚠️ <strong>发现 1 个问题</strong>
+            【ERROR】条款矛盾：第5条写质保期 3 年，第7条写 1 年
+          </div>
         </div>
       </div>
     </div>
