@@ -1,0 +1,5 @@
+{
+  "openai_api_key": "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",
+  "openai_base_url": "https://integrate.api.nvidia.com/v1",
+  "openai_model": "openai/gpt-oss-120b"
+}
