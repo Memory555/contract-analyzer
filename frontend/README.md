@@ -21,6 +21,7 @@ http://localhost:3000
 
 ```text
 NEXT_PUBLIC_BACKEND_API_BASE_URL=http://localhost:8000
+BACKEND_API_BASE_URL=http://localhost:8000
 ```
 
 v6 前端不再配置 `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL`。用户个人模型在页面“设置”中保存，并随上传任务提交给后端；管理员全局模型在后端 `/admin` 中配置。

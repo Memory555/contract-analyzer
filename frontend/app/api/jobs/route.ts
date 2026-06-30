@@ -5,10 +5,9 @@ export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
-    const response = await fetch(buildBackendUrl("/api/model-test"), {
+    const response = await fetch(buildBackendUrl("/api/jobs"), {
       method: "POST",
-      headers: { "Content-Type": request.headers.get("content-type") || "application/json" },
-      body: await request.text()
+      body: await request.formData()
     });
     return toProxyResponse(response);
   } catch (error) {

@@ -3,12 +3,12 @@ import { buildBackendUrl, proxyErrorResponse, toProxyResponse } from "@/app/api/
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-export async function POST(request: Request) {
+export async function GET(_: Request, { params }: { params: Promise<{ jobId: string }> }) {
   try {
-    const response = await fetch(buildBackendUrl("/api/model-test"), {
-      method: "POST",
-      headers: { "Content-Type": request.headers.get("content-type") || "application/json" },
-      body: await request.text()
+    const { jobId } = await params;
+    const response = await fetch(buildBackendUrl(`/api/jobs/${encodeURIComponent(jobId)}`), {
+      method: "GET",
+      cache: "no-store"
     });
     return toProxyResponse(response);
   } catch (error) {
