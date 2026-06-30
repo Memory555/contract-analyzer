@@ -7,6 +7,7 @@ export type ContractIssue = {
   description: string;
   location: string;
   sourceText: string;
+  suggestion?: string;
 };
 
 export type PaymentPlanItem = {
@@ -61,8 +62,10 @@ export type BatchAnalysisStatus = "pending" | "analyzing" | "partial_success" | 
 export type ContractAnalysisRecord = {
   id: string;
   batchId: string;
+  jobId?: string;
   uploadIndex: number;
   fileName: string;
+  fileType?: string;
   displayName: string;
   exportName: string;
   fileSize: number;
@@ -70,6 +73,8 @@ export type ContractAnalysisRecord = {
   createdAt: string;
   updatedAt: string;
   contractText?: string;
+  extractionSourceType?: string;
+  extractionWarnings?: string[];
   result?: AnalysisResult;
   errorMessage?: string;
 };

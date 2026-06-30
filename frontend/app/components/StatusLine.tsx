@@ -13,12 +13,12 @@ export function StatusLine({
   error: string;
   message: string;
 }) {
-  if (status === "idle") return <p className="status-line">{message || "请选择 DOCX 合同文件加入待分析列表。"}</p>;
+  if (status === "idle") return <p className="status-line">{message || "请选择 PDF、DOC、DOCX、JPG 或 PNG 合同文件加入待分析列表。"}</p>;
   if (status === "uploading" || status === "analyzing") {
     return (
       <p className="status-line active">
         <Loader2 size={16} className="spin" />
-        {status === "uploading" ? "正在提取 DOCX 文本" : "正在分析合同，预计 10-30 秒"}：{fileName}
+        {status === "uploading" ? "正在解析合同文本，扫描件可能需要更长时间" : "正在分析合同"}：{fileName}
       </p>
     );
   }
@@ -29,7 +29,7 @@ export function StatusLine({
 export function statusLabel(status: Status) {
   const labels: Record<Status, string> = {
     idle: "待上传",
-    uploading: "提取文本中",
+    uploading: "文档解析中",
     analyzing: "AI 解析中",
     success: "解析完成",
     error: "需要处理"

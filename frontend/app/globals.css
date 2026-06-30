@@ -1016,31 +1016,138 @@ td span {
   background: var(--info-soft);
 }
 
-.issue-list {
+.issue-table-sections {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.issue-table-section,
+.issue-summary-section {
+  display: grid;
   gap: 12px;
 }
 
-.issue-card {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 16px;
-  background: white;
-  transition: box-shadow var(--transition-normal), transform var(--transition-fast);
+.issue-summary-section {
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
 }
 
-.issue-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+.issue-table-section h3,
+.issue-summary-section h3 {
+  margin: 0;
 }
 
-.issue-card p {
-  color: #42526b;
-  line-height: 1.65;
+.issue-section-title,
+.severity-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
 }
 
-.issue-card button,
+.issue-section-title {
+  font-size: 18px;
+}
+
+.severity-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+.severity-dot.error {
+  background: linear-gradient(135deg, #f87171, #be123c);
+}
+
+.severity-dot.warning {
+  background: linear-gradient(135deg, #fde68a, #d97706);
+}
+
+.severity-dot.info {
+  background: linear-gradient(135deg, #93c5fd, #4f46e5);
+}
+
+.issue-table-wrap {
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+.issue-detail-table,
+.issue-summary-table {
+  min-width: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.issue-detail-table th,
+.issue-detail-table td,
+.issue-summary-table th,
+.issue-summary-table td {
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  background: transparent;
+  vertical-align: middle;
+}
+
+.issue-detail-table th:last-child,
+.issue-detail-table td:last-child,
+.issue-summary-table th:last-child,
+.issue-summary-table td:last-child {
+  border-right: 0;
+}
+
+.issue-detail-table tbody tr:last-child td,
+.issue-summary-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.issue-detail-table th,
+.issue-summary-table th {
+  background: #f6f6f7;
+  color: #111827;
+  font-size: 16px;
+}
+
+.issue-detail-table td,
+.issue-summary-table td {
+  font-size: 15px;
+  color: #111827;
+}
+
+.issue-detail-table th:nth-child(1),
+.issue-detail-table td:nth-child(1) {
+  width: 72px;
+  text-align: center;
+}
+
+.issue-detail-table th:nth-child(2),
+.issue-detail-table td:nth-child(2) {
+  width: 130px;
+}
+
+.issue-detail-table th:nth-child(3),
+.issue-detail-table td:nth-child(3) {
+  width: 150px;
+}
+
+.issue-summary-table th:nth-child(1),
+.issue-summary-table td:nth-child(1) {
+  width: 190px;
+}
+
+.issue-summary-table th:nth-child(2),
+.issue-summary-table td:nth-child(2) {
+  width: 100px;
+}
+
+.issue-location-button {
+  text-align: left;
+  line-height: 1.5;
+}
+
 .link-button {
   border: 0;
   background: transparent;
@@ -1052,7 +1159,6 @@ td span {
   transition: color var(--transition-fast);
 }
 
-.issue-card button:hover,
 .link-button:hover {
   color: var(--blue-hover);
   text-decoration: underline;

@@ -1,6 +1,6 @@
-# 合同智能分析平台 Demo
+# 合同智能分析平台 v6 前端
 
-这是早期 Demo 版本，采用 Next.js 方案，仅支持 DOCX。
+这是 v6 前端工作台，文件解析、OCR 和模型分析由 FastAPI 后端处理。
 
 ## 本地运行
 
@@ -20,19 +20,23 @@ http://localhost:3000
 复制 `.env.example` 为 `.env.local`，按需填写：
 
 ```text
-OPENAI_API_KEY=
-OPENAI_BASE_URL=https://api.openai.com/v1
-OPENAI_MODEL=gpt-4.1-mini
-NEXT_PUBLIC_DEMO_MODE=true
+NEXT_PUBLIC_BACKEND_API_BASE_URL=http://localhost:8000
 ```
 
-未配置 `OPENAI_API_KEY` 时，系统会返回内置演示结果，方便先测试 UI 闭环。
+v6 前端不再配置 `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL`。用户个人模型在页面“设置”中保存，并随上传任务提交给后端；管理员全局模型在后端 `/admin` 中配置。
+
+如需使用反馈管理的云端反馈接口，还可以配置 `.env.example` 中的 PostgreSQL 变量：
+
+```text
+DATABASE_URL=
+PG_SSL=true
+```
 
 ## 当前范围
 
-- DOCX 上传
-- 浏览器端 DOCX 文本提取
-- Serverless API 调用 OpenAI 或返回演示结果
+- PDF / DOC / DOCX / JPG / PNG 上传
+- 调用 v6 后端创建解析任务
+- 后端解析、OCR 和模型分析
 - 问题提示、付款计划、质保明细展示
 - 原文片段抽屉
 - IndexedDB 保存最近记录
@@ -43,7 +47,7 @@ NEXT_PUBLIC_DEMO_MODE=true
 - 页面主要展示文案：`app/page.tsx`
 - 浏览器标题和图标：`app/layout.tsx`
 - 样式：`app/globals.css`
-- 模型抽取提示词：`app/api/analyze/route.ts`
+- 后端 API client：`lib/backend-api.ts`
 
 当前不是传统单个静态 HTML 文件，而是 Next.js 应用。修改 `app/page.tsx` 后需要重新部署或重新构建。
 

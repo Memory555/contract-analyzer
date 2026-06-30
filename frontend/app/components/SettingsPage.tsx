@@ -39,7 +39,8 @@ export function SettingsPage({
   async function testModelService() {
     setTestStatus({ type: "testing", message: "正在测试模型服务连通性..." });
     try {
-      const response = await fetch("/api/model-test", {
+      const backendBaseUrl = (process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL || "").replace(/\/+$/, "");
+      const response = await fetch(`${backendBaseUrl}/api/model-test`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -48,13 +49,13 @@ export function SettingsPage({
           openaiModel: draft.openaiModel.trim() || undefined
         })
       });
-      const data = (await response.json()) as { message?: string; model?: string; baseURL?: string };
+      const data = (await response.json()) as { message?: string; model?: string; baseURL?: string; mode?: string; source?: { model?: string } };
       if (!response.ok) {
         throw new Error(data.message || "模型服务联通测试失败。");
       }
       setTestStatus({
         type: "success",
-        message: `联通成功：${data.model || "当前模型"}，${data.baseURL || "当前地址"}`
+        message: `联通成功：${data.model || "当前模型"}，${data.baseURL || "当前地址"}，${data.mode || "当前接口"}，来源：${data.source?.model || "默认"}`
       });
     } catch (error) {
       setTestStatus({
@@ -81,8 +82,8 @@ export function SettingsPage({
         <article className={openSection === "model" ? "settings-item open" : "settings-item"}>
           <button className="settings-summary" type="button" onClick={() => setOpenSection("model")}>
             <span>
-              <strong>模型服务配置</strong>
-              <small>配置 OpenAI 或兼容 OpenAI 协议的服务地址、Key 和模型名</small>
+              <strong>个人默认模型服务配置</strong>
+              <small>保存后会存于当前浏览器，后续上传默认优先使用个人模型；留空则使用后端管理员全局模型</small>
             </span>
             <span>{openSection === "model" ? "收起" : "展开"}</span>
           </button>
@@ -93,7 +94,7 @@ export function SettingsPage({
                 <input
                   value={draft.openaiBaseUrl}
                   onChange={(event) => setDraft({ ...draft, openaiBaseUrl: event.target.value })}
-                  placeholder="留空或官方地址走全局变量；自定义地址需填写 API Key"
+                  placeholder="留空则使用后端管理员配置；自定义地址需填写 API Key"
                 />
               </label>
               <label>
@@ -102,7 +103,7 @@ export function SettingsPage({
                   value={draft.openaiApiKey}
                   onChange={(event) => setDraft({ ...draft, openaiApiKey: event.target.value })}
                   type="password"
-                  placeholder="官方地址可留空走全局变量；自定义地址需填写"
+                  placeholder="留空则使用后端管理员配置；自定义地址需填写"
                 />
               </label>
               <label>
@@ -110,7 +111,7 @@ export function SettingsPage({
                 <input
                   value={draft.openaiModel}
                   onChange={(event) => setDraft({ ...draft, openaiModel: event.target.value })}
-                  placeholder="留空则使用 Vercel 环境变量 OPENAI_MODEL"
+                  placeholder="留空则使用后端管理员配置"
                 />
               </label>
               <div className="settings-actions">
@@ -152,7 +153,7 @@ export function SettingsPage({
           {openSection === "about" ? (
             <div className="settings-content about-panel">
               <p>
-                合同智能分析平台用于将 DOCX 合同中的付款计划、质保明细和合同问题结构化展示，并支持 Excel 导出。
+                合同智能分析平台用于将 PDF、DOC、DOCX、JPG、PNG 合同中的付款计划、质保明细和合同问题结构化展示，并支持 Excel 导出。
               </p>
               <div className="theme-toggle-row">
                 <span>外观模式</span>
@@ -167,7 +168,7 @@ export function SettingsPage({
                 </div>
                 <div>
                   <dt>文件范围</dt>
-                  <dd>仅 DOCX</dd>
+                  <dd>PDF / DOC / DOCX / JPG / PNG</dd>
                 </div>
                 <div>
                   <dt>页面形态</dt>

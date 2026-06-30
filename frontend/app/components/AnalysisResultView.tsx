@@ -8,6 +8,14 @@ const severityMap = {
   info: "提示"
 };
 
+const severityTitleMap = {
+  error: "错误（ERROR）",
+  warning: "警告（WARNING）",
+  info: "提示（INFO）"
+};
+
+const severityOrder = ["error", "warning", "info"] as const;
+
 /** 翻译合同问题 type 英文名 → 中文 */
 const issueTypeMap: Record<string, string> = {
   ContradictoryTerms: "条款矛盾",
@@ -79,6 +87,7 @@ export function AnalysisResultView({
   const paymentItems = result.payment_plan.filter(
     (item) => item.percentage && item.percentage !== "N/A" && !item.stage.includes("发票") && !item.name.includes("发票")
   );
+  const issueIndex = new Map(result.issues.map((issue, index) => [issue.id, index + 1]));
 
   return (
     <section className="results">
@@ -110,18 +119,80 @@ export function AnalysisResultView({
         {result.issues.length === 0 ? (
           <p className="empty">未发现合同问题。</p>
         ) : (
-          <div className="issue-list">
-            {result.issues.map((issue) => (
-              <article key={issue.id} className={`issue-card ${issue.severity}`}>
-                <span className={`tag ${issue.severity}`}>{severityMap[issue.severity]}</span>
-                <strong>{translateIssueType(issue.type)}</strong>
-                <p>{issue.description}</p>
-                <button type="button" onClick={() => onOpenSource(issue)}>
-                  <Search size={15} />
-                  查看原文位置：{issue.location || "未标明"}
-                </button>
-              </article>
-            ))}
+          <div className="issue-table-sections">
+            {severityOrder.map((severity) => {
+              const severityIssues = result.issues.filter((issue) => issue.severity === severity);
+              if (severityIssues.length === 0) return null;
+              return (
+                <section className="issue-table-section" key={severity}>
+                  <h3 className={`issue-section-title ${severity}`}>
+                    <span className={`severity-dot ${severity}`} />
+                    {severityTitleMap[severity]}
+                  </h3>
+                  <div className="table-wrap issue-table-wrap">
+                    <table className="issue-detail-table">
+                      <thead>
+                        <tr>
+                          <th>序号</th>
+                          <th>问题分类</th>
+                          <th>位置</th>
+                          <th>问题描述</th>
+                          <th>修改建议</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {severityIssues.map((issue) => (
+                          <tr key={issue.id}>
+                            <td>{issueIndex.get(issue.id)}</td>
+                            <td>{translateIssueType(issue.type)}</td>
+                            <td>
+                              <button className="link-button issue-location-button" type="button" onClick={() => onOpenSource(issue)}>
+                                <Search size={14} />
+                                {issue.location || "查看原文"}
+                              </button>
+                            </td>
+                            <td>{issue.description}</td>
+                            <td>{issue.suggestion || buildIssueSuggestion(issue)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              );
+            })}
+
+            <section className="issue-summary-section">
+              <h3>问题摘要</h3>
+              <div className="table-wrap issue-table-wrap">
+                <table className="issue-summary-table">
+                  <thead>
+                    <tr>
+                      <th>风险等级</th>
+                      <th>数量</th>
+                      <th>核心风险</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {severityOrder.map((severity) => {
+                      const severityIssues = result.issues.filter((issue) => issue.severity === severity);
+                      return (
+                        <tr key={severity}>
+                          <td>
+                            <span className="severity-label">
+                              <span className={`severity-dot ${severity}`} />
+                              {severity.toUpperCase()}
+                            </span>
+                          </td>
+                          <td>{severityIssues.length}</td>
+                          <td>{summarizeIssueTypes(severityIssues)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
           </div>
         )}
       </section>
@@ -208,6 +279,23 @@ function formatStage(item: PaymentPlanItem): React.ReactNode {
 /** 将 warranty items 的 field 字段从英文翻译成中文 */
 function translateFields(items: WarrantyField[]): WarrantyField[] {
   return items.map((item) => ({ ...item, field: translateField(item.field) }));
+}
+
+function summarizeIssueTypes(issues: ContractIssue[]) {
+  if (issues.length === 0) return "无";
+  const uniqueTypes = Array.from(new Set(issues.map((issue) => translateIssueType(issue.type)).filter(Boolean)));
+  return uniqueTypes.join("、");
+}
+
+function buildIssueSuggestion(issue: ContractIssue) {
+  const type = translateIssueType(issue.type);
+  if (type.includes("缺失")) return "补充缺失条款或清单，明确适用范围、责任主体和验收标准。";
+  if (type.includes("矛盾") || type.includes("冲突")) return "统一前后条款表述，删除或修订冲突内容，并保留最终确认版本。";
+  if (type.includes("付款")) return "明确付款节点、触发条件、发票要求和支付时限，避免执行争议。";
+  if (type.includes("质保") || type.includes("响应")) return "明确质保期、响应时效、处理时限和违约责任。";
+  if (type.includes("违约") || type.includes("责任")) return "补充责任上限、违约触发条件和例外情形，确保责任边界清晰。";
+  if (type.includes("数值")) return "确认所有待定数值和括号标注，删除临时标记或补齐最终数值。";
+  return `建议结合原文位置复核“${type}”相关条款，补充明确、可执行的修订表述。`;
 }
 
 export type { SourceItem };

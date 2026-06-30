@@ -11,7 +11,7 @@ import {
   Settings,
   UploadCloud
 } from "lucide-react";
-import { extractDocxText, validateDocxFile } from "@/lib/docx";
+import { createAnalysisJob, getAnalysisJobResult, validateContractFile, waitForAnalysisJob } from "@/lib/backend-api";
 import { exportAnalysisExcel, exportBatchAnalysisExcel } from "@/lib/excel";
 import {
   bulkSaveContractAnalysisRecords,
@@ -27,7 +27,6 @@ import {
 import { normalizeAnalysisResult } from "@/lib/normalize";
 import type {
   AnalysisResult,
-  AnalyzeResponse,
   BatchAnalysisRecord,
   ContractAnalysisRecord,
   ContractIssue,
@@ -66,7 +65,6 @@ const navItems = [
 const SETTINGS_STORAGE_KEY = "contract-analyzer-demo-settings-v2";
 const LEGACY_SETTINGS_STORAGE_KEY = "contract-analyzer-demo-settings";
 const MAX_BATCH_FILES = 20;
-const MAX_CONCURRENT = 1;
 
 export default function HomeWrapper() {
   return <AppProvider><Home /></AppProvider>;
@@ -214,9 +212,9 @@ function Home() {
     const createdAt = now.toISOString();
     const nextContracts: ContractAnalysisRecord[] = files.map((file, index) => {
       const uploadIndex = index + 1;
-      const displayName = file.name.replace(/\.(docx|doc|pdf)$/i, "") || `合同${uploadIndex}`;
+      const displayName = file.name.replace(/\.(docx|doc|pdf|jpe?g|png)$/i, "") || `合同${uploadIndex}`;
       const paddedIndex = String(uploadIndex).padStart(3, "0");
-      const validationError = validateDocxFile(file);
+      const validationError = validateContractFile(file);
       return {
         id: `c_${stamp}_${paddedIndex}_${crypto.randomUUID().slice(0, 8)}`,
         batchId,
@@ -250,36 +248,40 @@ function Home() {
     await saveContractAnalysisRecord(uploadingContract);
 
     try {
-      const contractText = await extractDocxText(file);
-      const analyzingContract = { ...uploadingContract, status: "analyzing" as const, updatedAt: new Date().toISOString() };
-      updateContract(analyzingContract);
-      await saveContractAnalysisRecord(analyzingContract);
+      const job = await createAnalysisJob(file, contract.batchId, contract.uploadIndex, {
+        openaiApiKey: llmSettings.openaiApiKey,
+        openaiBaseUrl: llmSettings.openaiBaseUrl,
+        openaiModel: llmSettings.openaiModel
+      });
+      const jobContract = {
+        ...uploadingContract,
+        jobId: job.jobId,
+        fileType: job.fileType,
+        updatedAt: new Date().toISOString()
+      };
+      updateContract(jobContract);
+      await saveContractAnalysisRecord(jobContract);
 
-      const pageApiKey = llmSettings.openaiApiKey.trim();
-      const pageBaseUrl = llmSettings.openaiBaseUrl.trim();
-      const pageModel = llmSettings.openaiModel.trim();
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileName: file.name,
-          contractText,
-          openaiApiKey: pageApiKey || undefined,
-          openaiBaseUrl: pageBaseUrl || undefined,
-          openaiModel: pageModel || undefined
-        })
+      const completedJob = await waitForAnalysisJob(job.jobId, (nextJob) => {
+        const nextStatus = nextJob.status === "analyzing" ? "analyzing" as const : "uploading" as const;
+        const nextContract = {
+          ...jobContract,
+          status: nextStatus,
+          errorMessage: nextJob.errorMessage || undefined,
+          updatedAt: nextJob.updatedAt
+        };
+        updateContract(nextContract);
+        void saveContractAnalysisRecord(nextContract);
       });
 
-      const data = (await response.json()) as AnalyzeResponse;
-      if (!response.ok) {
-        throw new Error(data.message || "解析失败，请重试。");
-      }
-
-      const analysis = normalizeAnalysisResult(data);
+      const data = await getAnalysisJobResult(completedJob.jobId);
+      const analysis = normalizeAnalysisResult(data.analysis);
       const successContract = {
-        ...analyzingContract,
+        ...jobContract,
         status: "success" as const,
-        contractText,
+        contractText: data.extraction.plainText,
+        extractionSourceType: data.extraction.sourceType,
+        extractionWarnings: data.extraction.warnings,
         result: analysis,
         errorMessage: undefined,
         updatedAt: new Date().toISOString()
@@ -288,7 +290,7 @@ function Home() {
       setResult(analysis);
       setFileName(file.name);
       setStatus("success");
-      setMessage(data.message || (data.demo ? "当前为演示数据。" : "解析完成。"));
+      setMessage(data.analysis.message || (data.analysis.demo ? "当前为演示数据。" : "解析完成。"));
       await saveContractAnalysisRecord(successContract);
       return successContract;
     } catch (nextError) {
@@ -312,7 +314,7 @@ function Home() {
     const files = fileList.slice(0, MAX_BATCH_FILES);
     if (files.length === 0) {
       setStatus("error");
-      setError("请选择 DOCX 合同文件。");
+      setError("请选择 PDF、DOC、DOCX、JPG 或 PNG 合同文件。");
       return;
     }
 
@@ -472,7 +474,7 @@ function Home() {
             <header className="topbar">
               <div>
                 <p>合同分析</p>
-                <h1>上传一批 DOCX 合同并生成结构化分析结果</h1>
+                <h1>上传一批 PDF / DOC / DOCX / JPG / PNG 合同并生成结构化分析结果</h1>
               </div>
               <div className="badges">
                 <span>v2 批量分析</span>
@@ -485,7 +487,7 @@ function Home() {
                 <div className="panel-title">
                   <div>
                     <h2>上传合同</h2>
-                    <p>支持 DOCX，多选或拖拽上传，单文件不超过 20MB。</p>
+                    <p>支持电子文档和扫描件，多选或拖拽上传，单文件不超过 20MB。</p>
                   </div>
                   <button className="secondary" type="button" onClick={() => fileInputRef.current?.click()}>
                     选择合同
@@ -507,9 +509,9 @@ function Home() {
                   tabIndex={0}
                 >
                   <UploadCloud size={42} />
-                  <strong>点击或拖拽添加 DOCX 合同</strong>
+                  <strong>点击或拖拽添加合同文件</strong>
                   <span>可分多次添加，点击开始分析后统一生成批次</span>
-                  <input ref={fileInputRef} type="file" accept=".docx" multiple onChange={handleFileChange} hidden />
+                  <input ref={fileInputRef} type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple onChange={handleFileChange} hidden />
                 </div>
 
                 {selectedFiles.length > 0 ? (

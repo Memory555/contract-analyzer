@@ -6,7 +6,7 @@ export function EmptyStateGuide({ onUpload }: { onUpload: () => void }) {
       <div className="guide-step">
         <UploadCloud size={28} />
         <strong>上传合同</strong>
-        <p>选择或拖拽 DOCX 文件加入待分析列表</p>
+        <p>选择或拖拽 PDF、DOC、DOCX、JPG、PNG 文件加入待分析列表</p>
       </div>
       <div className="guide-step">
         <FileCheck2 size={28} />

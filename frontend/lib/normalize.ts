@@ -33,7 +33,8 @@ function normalizeIssue(value: unknown, index: number): ContractIssue {
     severity,
     description: asString(item.description) || sourceText || "未提及",
     location: asString(item.location) || "未提及",
-    sourceText: sourceText || "未提及"
+    sourceText: sourceText || "未提及",
+    suggestion: asString(item.suggestion ?? item.recommendation ?? item.advice)
   };
 }
 

@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "合同智能分析平台 Demo",
-  description: "DOCX 合同智能分析 Demo",
+  description: "多格式合同智能分析平台",
   icons: {
     icon: "/feidu-logo.png",
     shortcut: "/feidu-logo.png",
