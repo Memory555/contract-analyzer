@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>合同智能分析平台 v6</title>
+<style>
+  :root {
+    --bg: #f8f9fb;
+    --card-bg: #ffffff;
+    --primary: #2563eb;
+    --primary-light: #dbeafe;
+    --accent: #7c3aed;
+    --accent-light: #ede9fe;
+    --success: #059669;
+    --success-light: #d1fae5;
+    --warning: #d97706;
+    --warning-light: #fef3c7;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --info: #0284c7;
+    --info-light: #e0f2fe;
+    --text: #1e293b;
+    --text-secondary: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { margin:0; padding:0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Hero Header */
+  .hero {
+    background: linear-gradient(135deg, #1e40af 0%, #7c3aed 50%, #db2777 100%);
+    color: white;
+    padding: 48px 32px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 70%, rgba(255,255,255,0.08) 0%, transparent 50%);
+    animation: heroFloat 20s ease-in-out infinite;
+  }
+  @keyframes heroFloat {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(5%, -3%); }
+  }
+  .hero h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+  .hero .meta {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+  }
+  .hero .meta-item {
+    background: rgba(255,255,255,0.15);
+    padding: 6px 16px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hero .meta-item a {
+    color: white;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .hero .meta-item a:hover { opacity: 0.85; }
+
+  /* Nav Tabs */
+  .nav-tabs {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    padding: 12px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+    flex-wrap: wrap;
+  }
+  .nav-tab {
+    padding: 8px 20px;
+    border-radius: 24px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .nav-tab:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+  .nav-tab.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  .nav-tab .tab-icon {
+    margin-right: 6px;
+    font-size: 1rem;
+  }
+
+  /* Main Content */
+  .main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+  }
+
+  .section {
+    display: none;
+    animation: fadeSlideIn 0.35s ease-out;
+  }
+  .section.visible { display: block; }
+
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Section Title */
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .icon {
+    width: 36px;
+    height: 36px;
+    background: var(--primary-light);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--primary);
+  }
+
+  /* Intro Card */
+  .intro-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 24px;
+    line-height: 1.8;
+  }
+  .intro-card .lead {
+    font-size: 1.05rem;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  /* Feature Cards */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .feature-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+    border: 1px solid var(--border);
+  }
+  .feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+  }
+  .feature-card .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .feature-card .card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+  }
+  .feature-card .card-label {
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  .feature-card .card-desc {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .fc-analyze .card-icon { background: var(--primary-light); color: var(--primary); }
+  .fc-export .card-icon { background: var(--success-light); color: var(--success); }
+  .fc-feedback .card-icon { background: var(--accent-light); color: var(--accent); }
+  .fc-settings .card-icon { background: var(--warning-light); color: var(--warning); }
+
+  /* Table Styles */
+  .styled-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 16px 0;
+    font-size: 0.88rem;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .styled-table thead th {
+    background: var(--primary);
+    color: white;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .styled-table thead th:first-child { border-radius: var(--radius) 0 0 0; }
+  .styled-table thead th:last-child { border-radius: 0 var(--radius) 0 0; }
+  .styled-table tbody td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .styled-table tbody tr:last-child td { border-bottom: none; }
+  .styled-table tbody tr:hover {
+    background: var(--primary-light);
+  }
+  .styled-table tbody tr {
+    transition: background 0.15s;
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-primary { background: var(--primary-light); color: var(--primary); }
+  .badge-accent { background: var(--accent-light); color: var(--accent); }
+  .badge-success { background: var(--success-light); color: var(--success); }
+  .badge-warning { background: var(--warning-light); color: var(--warning); }
+  .badge-danger { background: var(--danger-light); color: var(--danger); }
+  .badge-info { background: var(--info-light); color: var(--info); }
+
+  /* Info Box */
+  .info-box {
+    background: var(--info-light);
+    border: 1px solid #bae6fd;
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .info-box .info-icon {
+    font-size: 1.1rem;
+    margin-top: 2px;
+  }
+  .info-box strong { color: var(--info); }
+
+  .note-box {
+    background: var(--warning-light);
+    border: 1px solid #fde68a;
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .note-box .note-icon { font-size: 1.1rem; margin-top: 2px; }
+
+  .tip-box {
+    background: var(--success-light);
+    border: 1px solid #a7f3d0;
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .tip-box .tip-icon { font-size: 1.1rem; margin-top: 2px; }
+
+  /* Step List */
+  .step-list {
+    counter-reset: step-counter;
+  }
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 0;
+    position: relative;
+  }
+  .step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 48px;
+    width: 2px;
+    height: calc(100% - 32px);
+    background: var(--primary-light);
+  }
+  .step-item .step-num {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .step-item .step-content {
+    flex: 1;
+  }
+  .step-item .step-content .step-text {
+    font-size: 0.92rem;
+    line-height: 1.7;
+  }
+  .step-item .step-content .step-code {
+    font-family: monospace;
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+  }
+
+  /* Skill Section */
+  .skill-hero {
+    background: linear-gradient(135deg, #059669 0%, #0891b2 50%, #2563eb 100%);
+    color: white;
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .skill-hero h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .skill-hero p {
+    font-size: 0.95rem;
+    opacity: 0.92;
+    line-height: 1.7;
+  }
+  .skill-hero .skill-version {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    background: rgba(255,255,255,0.18);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  /* Three Usage Cards */
+  .usage-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .usage-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 24px 18px;
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--border);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    cursor: pointer;
+  }
+  .usage-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+  .usage-card.active {
+    border-color: var(--success);
+  }
+  .usage-card .usage-icon {
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+  }
+  .usage-card .usage-label {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .usage-card .usage-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  .usage-card .usage-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .tag-api { background: var(--warning-light); color: var(--warning); }
+  .tag-noapi { background: var(--success-light); color: var(--success); }
+  .tag-simple { background: var(--info-light); color: var(--info); }
+
+  .usage-card.cli:hover, .usage-card.cli.active { border-color: #2563eb; }
+  .usage-card.ai:hover, .usage-card.ai.active { border-color: #059669; }
+  .usage-card.chat:hover, .usage-card.chat.active { border-color: #d97706; }
+
+  /* Usage Detail Panel */
+  .usage-panel {
+    display: none;
+    animation: fadeSlideIn 0.3s ease-out;
+  }
+  .usage-panel.visible { display: block; }
+
+  .platform-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .platform-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .platform-card .plat-icon {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+  }
+  .platform-card .plat-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+  .platform-card .plat-desc {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+  }
+
+  .code-block {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 16px 0;
+  }
+  .code-block .comment { color: #94a3b8; }
+  .code-block .cmd { color: #7dd3fc; }
+  .code-block .arg { color: #fbbf24; }
+  .code-block .str { color: #86efac; }
+  .code-block .prompt { color: #fca5a5; font-weight: 600; }
+  .code-block .response { color: #e2e8f0; }
+
+  .chat-bubble {
+    background: #f1f5f9;
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    margin: 8px 0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .chat-bubble.user {
+    border-left: 3px solid var(--primary);
+    background: #eff6ff;
+  }
+  .chat-bubble.ai {
+    border-left: 3px solid var(--success);
+    background: #f0fdf4;
+  }
+  .chat-bubble .label {
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+    color: var(--text-secondary);
+  }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 16px 0;
+    font-size: 0.88rem;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .compare-table thead th {
+    background: var(--accent);
+    color: white;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .compare-table tbody td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .compare-table tbody tr:last-child td { border-bottom: none; }
+  .compare-table tbody tr:nth-child(even) { background: #f8fafc; }
+
+  .download-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .download-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .download-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--success);
+  }
+  .download-card .dl-icon {
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+  }
+  .download-card .dl-label {
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .download-card .dl-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+  .download-card .dl-btn {
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .dl-btn-primary {
+    background: var(--success);
+    color: white;
+  }
+  .dl-btn-primary:hover { background: #047857; }
+  .dl-btn-accent {
+    background: var(--primary);
+    color: white;
+  }
+  .dl-btn-accent:hover { background: #1d4ed8; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 24px 16px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .feature-grid, .usage-cards, .platform-grid, .download-cards { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.4rem; }
+    .nav-tab { padding: 6px 12px; font-size: 0.8rem; }
+  }
+  @media (max-width: 768px) {
+    .usage-cards { grid-template-columns: 1fr; }
+    .platform-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>🤖 合同智能分析平台 v6</h1>
+  <div class="meta">
+    <div class="meta-item">📅 2026-06-30</div>
+    <div class="meta-item">🔗 在线访问：<a href="https://contract-analyzer-frontend-273126-6-1321049800.sh.run.tcloudbase.com" target="_blank">CloudBase 前端</a></div>
+    <div class="meta-item">🔗 GitHub:<a href="https://github.com/Memory555/contract-analyzer" target="_blank">contract-analyzer</a></div>
+  </div>
+</div>
+
+<!-- Nav Tabs -->
+<div class="nav-tabs" id="navTabs">
+  <div class="nav-tab active" data-tab="overview"><span class="tab-icon">📋</span>平台概览</div>
+  <div class="nav-tab" data-tab="skill"><span class="tab-icon">🛠️</span>Skill 说明</div>
+  <div class="nav-tab" data-tab="tech"><span class="tab-icon">🧱</span>技术栈</div>
+  <div class="nav-tab" data-tab="deploy"><span class="tab-icon">☁️</span>部署平台</div>
+  <div class="nav-tab" data-tab="limits"><span class="tab-icon">⚠️</span>当前限制</div>
+  <div class="nav-tab" data-tab="qiqi"><span class="tab-icon">🔗</span>企企集成判断</div>
+  <div class="nav-tab" data-tab="verify"><span class="tab-icon">✅</span>验证步骤</div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Section 1: Overview -->
+  <div class="section visible" id="sec-overview">
+    <div class="section-title"><div class="icon">📋</div> 平台是什么</div>
+    <div class="intro-card">
+      <div class="lead">合同智能分析平台是一款面向合同审查人员的辅助工具，核心能力是把 DOCX 合同文件交给 AI 模型自动提取和检查，输出结构化的<span class="badge badge-primary">付款计划</span>、<span class="badge badge-accent">质保明细</span>和<span class="badge badge-warning">风险提示</span>，降低人工逐页翻阅的成本。</div>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card fc-analyze">
+        <div class="card-header">
+          <div class="card-icon">🔍</div>
+          <div class="card-label">合同分析</div>
+        </div>
+        <div class="card-desc">上传 DOCX → AI 自动提取付款计划（阶段、比例、时限）、质保明细（核心 + 扩展字段）、合同问题（error / warning / info 三级）；支持单份和批量（最多 <span class="badge badge-primary">20 份</span>），串行执行、单份失败不影响其余</div>
+      </div>
+      <div class="feature-card fc-export">
+        <div class="card-header">
+          <div class="card-icon">📊</div>
+          <div class="card-label">导出中心</div>
+        </div>
+        <div class="card-desc">单合同 Excel 导出；批量汇总 Excel（5 个 Sheet：概览、付款计划、质保、问题、失败清单）</div>
+      </div>
+      <div class="feature-card fc-feedback">
+        <div class="card-header">
+          <div class="card-icon">💬</div>
+          <div class="card-label">反馈管理</div>
+        </div>
+        <div class="card-desc">对分析结果提交"有帮助"或"有问题"反馈；问题可选 5 种分类；另提供"我的云端总览"统计卡片 + 分页列表</div>
+      </div>
+      <div class="feature-card fc-settings">
+        <div class="card-header">
+          <div class="card-icon">⚙️</div>
+          <div class="card-label">设置</div>
+        </div>
+        <div class="card-desc">配置模型服务（Base URL / API Key / 模型名）、联通测试、切换亮/暗色主题、清除本地数据</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Skill 说明 -->
+  <div class="section" id="sec-skill">
+    <div class="section-title"><div class="icon">🛠️</div> Skill 说明</div>
+
+    <div class="skill-hero">
+      <div class="skill-version">v5.0.0</div>
+      <h2>合同智能分析 Skill</h2>
+      <p>轻量级的合同分析能力，无需部署平台，支持三种使用方式。<br>适合偶尔分析 1-2 份合同，快速查看付款和质保条款。</p>
+    </div>
+
+    <!-- 三种使用方式卡片 -->
+    <div class="intro-card">
+      <div class="lead"><strong>🎯 两种使用方式</strong></div>
+      <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">点击卡片查看详细使用说明，选择最适合你工作流的方案：</p>
+      <div class="usage-cards">
+        <div class="usage-card ai" onclick="showUsage('ai')">
+          <div class="usage-icon">🤖</div>
+          <div class="usage-label">AI 平台 Skill</div>
+          <div class="usage-desc">安装在 Codex / Claude / WorkBuddy 中<br>由平台提供模型能力</div>
+          <div class="usage-tag tag-noapi">无需配置 API</div>
+        </div>
+        <div class="usage-card chat" onclick="showUsage('chat')">
+          <div class="usage-icon">💬</div>
+          <div class="usage-label">直接对话上传</div>
+          <div class="usage-desc">在任何支持文件上传的 AI 对话中<br>直接发送文件 + 提示词</div>
+          <div class="usage-tag tag-simple">最简单</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 方式一：AI 平台 Skill -->
+    <div class="usage-panel" id="usage-ai">
+      <div class="intro-card">
+        <div class="lead"><strong>🤖 方式一：AI 平台 Skill（推荐）</strong></div>
+        <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:12px;">适合：经常使用 AI 工具（Cursor、Claude、WorkBuddy 等）的用户，无需关心 API 配置</p>
+
+        <div class="tip-box">
+          <div class="tip-icon">🌟</div>
+          <div><strong>核心优势：</strong>无需配置 API Key，由 AI 平台统一提供模型能力。安装 Skill 后，直接在对话中上传合同文件即可分析。</div>
+        </div>
+
+        <div class="platform-grid" style="margin-top:20px;">
+          <div class="platform-card">
+            <div class="plat-icon">🔷</div>
+            <div class="plat-name">Codex</div>
+            <div class="plat-desc">OpenAI 的编码 Agent<br>支持 Skill 扩展</div>
+          </div>
+          <div class="platform-card">
+            <div class="plat-icon">🟣</div>
+            <div class="plat-name">Claude</div>
+            <div class="plat-desc">Anthropic 的 AI 助手<br>支持 MCP / Skill 接入</div>
+          </div>
+          <div class="platform-card">
+            <div class="plat-icon">🔶</div>
+            <div class="plat-name">WorkBuddy</div>
+            <div class="plat-desc">WorkBuddy 工作台<br>支持自定义 Skill 安装</div>
+          </div>
+        </div>
+
+        <!-- 安装方式 A：AI 平台直接安装 -->
+        <div class="intro-card" style="margin-top:20px;">
+          <div class="lead" style="font-size:1.05rem;margin-bottom:16px;"><strong>📥 安装方式 A：AI 平台直接安装</strong> <span class="badge badge-success" style="margin-left:8px;font-size:0.75rem;">推荐</span></div>
+          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">无需下载任何文件。直接在 AI 平台对话中发送安装指令，平台自动从 GitHub 拉取并集成 Skill。</p>
+
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <div class="step-text">在 AI 平台对话中输入安装指令：</div>
+                <div style="margin-top:12px;">
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;">
+                    <div style="font-weight:600;font-size:0.92rem;margin-bottom:6px;color:var(--primary);">🔷 Codex（OpenAI）</div>
+                    <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">在对话中输入：<span style="font-family:monospace;background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">从 https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill.zip 安装合同智能分析 Skill</span></div>
+                  </div>
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;">
+                    <div style="font-weight:600;font-size:0.92rem;margin-bottom:6px;color:var(--accent);">🟣 Claude（Anthropic）</div>
+                    <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">在 Project Settings → Skills 中，添加 URL：<span style="font-family:monospace;background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill.zip</span></div>
+                  </div>
+                  <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;">
+                    <div style="font-weight:600;font-size:0.92rem;margin-bottom:6px;color:var(--warning);">🔶 WorkBuddy</div>
+                    <div style="font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">在对话中输入：<span style="font-family:monospace;background:#fff;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">从 https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill.zip 安装合同智能分析 Skill</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <div class="step-text">确认安装成功，开始分析合同：</div>
+                <div class="chat-bubble user" style="margin-top:10px;">
+                  <div class="label">👤 用户</div>
+                  利用 contract-analyzer-skill 分析这份合同，提取付款计划和质保条款 [上传 合同.docx]
+                </div>
+                <div class="chat-bubble ai" style="margin-top:8px;">
+                  <div class="label">🤖 AI（已加载 Skill）</div>
+                  正在分析合同...
+
+                  📊 <strong>付款计划</strong>
+                  | 阶段 | 名称 | 比例 | 触发条件 | 时限 |
+                  | 第一阶段 | 预付款 | 30% | 合同签订后 | 5个工作日 |
+                  | 第二阶段 | 验收款 | 65% | 系统验收合格 | 15个工作日 |
+                  | 第三阶段 | 质保金 | 5% | 质保期满 | 10个工作日 |
+
+                  🔧 <strong>质保明细</strong>
+                  | 质保期 | 验收合格之日起 1 年 |
+                  | 响应时效 | 重大故障 0.5h 响应，3h 解决 |
+
+                  ⚠️ <strong>发现 1 个问题</strong>
+                  【ERROR】条款矛盾：第5条写质保期 3 年，第7条写 1 年
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 安装方式 B：本地路径安装 -->
+        <div class="intro-card" style="margin-top:16px;">
+          <div class="lead" style="font-size:1.05rem;margin-bottom:16px;"><strong>📂 安装方式 B：下载后从本地路径安装</strong></div>
+          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:16px;">适合网络受限或需要自定义 Skill 的场景。手动下载到本地，然后在 AI 平台中指定本地路径加载。</p>
+
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <div class="step-text">浏览器下载 Skill 包到本地，解压到项目目录：</div>
+                <div style="margin-top:10px;font-size:0.85rem;color:var(--text-secondary);line-height:1.8;">
+                  <div>1. 访问 <a href="https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill.zip" target="_blank" style="color:var(--primary);">下载链接</a>（或浏览器直接打开该地址）</div>
+                  <div>2. 将下载的 zip 文件解压到项目目录，例如：<span style="font-family:monospace;background:#f8fafc;padding:2px 6px;border-radius:4px;border:1px solid #e2e8f0;">my-project/skills/contract-analyzer</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <div class="step-text">确认安装成功，开始分析合同：</div>
+                <div class="chat-bubble user" style="margin-top:10px;">
+                  <div class="label">👤 用户</div>
+                  利用 contract-analyzer-skill 分析这份合同，提取付款计划和质保条款 [上传 合同.docx]
+                </div>
+                <div class="chat-bubble ai" style="margin-top:8px;">
+                  <div class="label">🤖 AI（已加载 Skill）</div>
+                  正在分析合同...
+
+                  📊 <strong>付款计划</strong>
+                  | 阶段 | 名称 | 比例 | 触发条件 | 时限 |
+                  | 第一阶段 | 预付款 | 30% | 合同签订后 | 5个工作日 |
+                  | 第二阶段 | 验收款 | 65% | 系统验收合格 | 15个工作日 |
+                  | 第三阶段 | 质保金 | 5% | 质保期满 | 10个工作日 |
+
+                  🔧 <strong>质保明细</strong>
+                  | 质保期 | 验收合格之日起 1 年 |
+                  | 响应时效 | 重大故障 0.5h 响应，3h 解决 |
+
+                  ⚠️ <strong>发现 1 个问题</strong>
+                  【ERROR】条款矛盾：第5条写质保期 3 年，第7条写 1 年
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 方式二：直接对话上传 -->
+    <div class="usage-panel" id="usage-chat">
+      <div class="intro-card">
+        <div class="lead"><strong>💬 方式二：直接对话上传（最简）</strong></div>
+        <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:12px;">适合：临时使用、无需安装任何工具、任何支持文件上传的 AI 对话</p>
+
+        <div class="tip-box">
+          <div class="tip-icon">⚡</div>
+          <div><strong>核心优势：</strong>零配置、零安装。直接在 ChatGPT、Claude、Gemini、Kimi 等任何对话中上传文件，配合一段提示词即可分析。</div>
+        </div>
+
+        <div class="step-list" style="margin-top:20px;">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-text">打开任意支持文件上传的 AI 对话（ChatGPT、Claude、Gemini、Kimi 等）</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-text">上传 DOCX 合同文件，并粘贴以下提示词：</div>
+              <div class="code-block"><span class="comment"># 通用提示词（可复制到任何 AI 对话中）</span>
+
+请分析这份合同，提取以下结构化信息，以 Markdown 表格输出：
+
+1. <span class="cmd">付款计划</span>：阶段、名称、比例、触发条件、时限、备注
+2. <span class="cmd">质保明细</span>：质保期、响应时效、违约金、服务范围、质保期起算日、质保金退还条件、质保范围排除项
+3. <span class="cmd">合同问题</span>：检查条款矛盾、数值缺失、逻辑冲突、定义模糊，按 ERROR / WARNING / INFO 分级
+
+注意：
+- 比例总和应为 100%，如果不符请标注
+- 质保期如有多种表述（如"3年"和"验收后1年"），请指出矛盾
+- 输出格式：Markdown 表格 + 问题列表</div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-text">AI 直接读取文件内容并输出分析结果，无需任何额外配置</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-bubble user" style="margin-top:20px;">
+          <div class="label">👤 用户示例</div>
+          使用 contract-analyzer-skill 分析这份采购合同，重点关注付款条款和质保条款。请以表格形式列出付款计划（阶段、比例、触发条件、时限），以及质保明细（质保期、响应时效、违约金）。同时检查是否有条款矛盾或数值缺失。[上传 采购合同.docx]
+        </div>
+
+        <div class="note-box">
+          <div class="note-icon">⚠️</div>
+          <div><strong>局限性：</strong>直接对话方式依赖 AI 自身对文件的理解能力，结构化程度不如 Skill 版本稳定。适合快速查看，不保证与平台版本输出完全一致。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 适用场景对比 -->
+    <div class="intro-card">
+      <div class="lead"><strong>📊 两种方式对比</strong></div>
+      <table class="compare-table">
+        <thead><tr><th>对比项</th><th>AI 平台 Skill</th><th>直接对话</th></tr></thead>
+        <tbody>
+          <tr><td>是否需要 API Key</td><td>❌ 不需要（平台提供）</td><td>❌ 不需要（平台提供）</td></tr>
+          <tr><td>是否需要安装</td><td>⚠️ 一次安装 Skill</td><td>❌ 完全不需要</td></tr>
+          <tr><td>结构化程度</td><td>高（JSON Schema 约束）</td><td>中（依赖模型能力）</td></tr>
+          <tr><td>输出稳定性</td><td>高</td><td>中（模型差异）</td></tr>
+          <tr><td>适用场景</td><td>日常办公、高频使用</td><td>临时查看、快速了解</td></tr>
+          <tr><td>离线可用</td><td>❌ 否</td><td>❌ 否</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 与平台版本对比 -->
+    <div class="intro-card">
+      <div class="lead"><strong>🏗️ Skill 与平台版本对比</strong></div>
+      <table class="compare-table">
+        <thead><tr><th>使用方式</th><th>平台版本（v4）</th><th>Skill 版本（v5）</th></tr></thead>
+        <tbody>
+          <tr><td>交互方式</td><td>Web 界面</td><td>AI 对话 / 直接对话</td></tr>
+          <tr><td>适用频率</td><td>高频、团队协作</td><td>偶尔分析 1-2 份</td></tr>
+          <tr><td>批量分析</td><td>支持（最多 20 份）</td><td>不支持（单份）</td></tr>
+          <tr><td>历史记录</td><td>本地 IndexedDB + 云端</td><td>无（临时分析）</td></tr>
+          <tr><td>Excel 导出</td><td>多 Sheet 批量汇总</td><td>不支持（仅文本报告）</td></tr>
+          <tr><td>部署要求</td><td>需部署到云平台</td><td>无需部署，直接使用</td></tr>
+          <tr><td>API 配置</td><td>Web 界面配置一次</td><td>Skill 无需配置 / 直接对话无需配置</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 输出示例 -->
+    <div class="intro-card">
+      <div class="lead"><strong>📋 输出示例</strong></div>
+      <div class="code-block" style="max-height:400px;overflow-y:auto;"># 合同分析结果
+
+**文件：** 采购合同.docx
+**分析时间：** 2026/6/26 12:00:00
+
+## 📊 置信度
+
+| 维度 | 分数 |
+|------|------|
+| 整体 | 0.92 |
+| 付款计划 | 0.95 |
+| 质保明细 | 0.88 |
+| 问题检测 | 0.90 |
+
+## 💳 付款计划
+
+| 阶段 | 名称 | 比例 | 触发条件 | 时限 | 备注 |
+|------|------|------|----------|------|------|
+| 第一阶段 | 预付款 | 30% | ① 收到业主方首付款 ② 乙方提供增值税专票 | 60个工作日 | 背靠背付款 |
+| 第二阶段 | 验收款 | 65% | ① 系统上线验收合格 ② 乙方提供全额发票 | 30个工作日 | - |
+| 第三阶段 | 质保金 | 5% | 质保期满且无质量问题 | 15个工作日 | - |
+
+## 🔧 质保明细
+
+| 字段 | 内容 | 备注 |
+|------|------|------|
+| 质保期 | 验收合格之日起 1 年 | - |
+| 响应时效 | 重大故障：0.5h 响应，3h 解决 | - |
+| 违约金 | 一般故障超时：1000元/次 | - |
+
+## ⚠️ 合同问题
+
+🔴 <strong>条款矛盾</strong>【ERROR】
+- 问题：5.4 条款写 3 年质保期，7.1 条款写 1 年质保期
+- 位置：第五条 vs 第七条
+- 原文：第五条约定质保期为验收合格后 3 年；第七条约定质保期为 1 年...
+
+---
+> ⚠️ 免责声明：本分析结果仅供参考，不构成法律意见。请始终以合同原文为准。</div>
+    </div>
+  </div>
+
+  <!-- Section 3: Tech Stack -->
+  <div class="section" id="sec-tech">
+    <div class="section-title"><div class="icon">🧱</div> 技术栈</div>
+    <table class="styled-table">
+      <thead>
+        <tr><th>层面</th><th>技术</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-primary">前端框架</span></td>
+          <td><strong>Next.js 15</strong>（App Router）+ React 19 + TypeScript</td>
+          <td>单页多面板架构，Serverless API Routes 兼做后端</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-accent">AI 调用</span></td>
+          <td><strong>OpenAI SDK</strong>（Responses API + JSON Schema Structured Outputs）</td>
+          <td>兼容任何 OpenAI 协议的服务</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-info">DOCX 提取</span></td>
+          <td><strong>mammoth.js</strong></td>
+          <td>浏览器端提取，无需后端</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-success">Excel 导出</span></td>
+          <td><strong>ExcelJS</strong></td>
+          <td>前端直接生成，无需后端</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-primary">云端数据库</span></td>
+          <td><strong>Neon PostgreSQL</strong>（新加坡节点）</td>
+          <td>反馈数据持久存储 + 用户数据隔离</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-info">本地数据库</span></td>
+          <td><strong>Dexie / IndexedDB</strong></td>
+          <td>历史记录、导出记录、反馈提交状态缓存</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-warning">容器化</span></td>
+          <td><strong>Dockerfile</strong>（三阶段构建，standalone 输出）</td>
+          <td>部署到 CloudBase 云托管</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-success">Skill 版本</span></td>
+          <td><strong>Node.js + mammoth + openai SDK</strong></td>
+          <td>AI 平台工作流，无需浏览器，跨平台运行</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Section 4: Deployment -->
+  <div class="section" id="sec-deploy">
+    <div class="section-title"><div class="icon">☁️</div> 部署在什么平台</div>
+
+    <div class="intro-card">
+      <div class="lead">v6 推荐部署在<strong>腾讯 CloudBase 云托管</strong>，采用“前端云托管 + 后端云托管”的双服务架构。前端负责页面、上传、轮询和展示；后端负责 PDF / DOC / DOCX / JPG / PNG 解析、扫描件 OCR 和大模型分析。</div>
+    </div>
+
+    <div class="limit-section">
+      <h3 style="font-size:1.15rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--success);display:inline-block;"></span> v6 部署概览</h3>
+      <table class="styled-table">
+        <thead>
+          <tr><th>服务</th><th>CloudBase 服务名</th><th>代码目录</th><th>端口</th><th>作用</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-primary">前端</span></td>
+            <td><span class="step-code">contract-analyzer-frontend</span></td>
+            <td><span class="step-code">frontend/</span></td>
+            <td><span class="step-code">3000</span></td>
+            <td>用户访问页面、上传合同、展示分析结果、提交反馈</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-info">后端</span></td>
+            <td><span class="step-code">contract-analyzer-backend</span></td>
+            <td><span class="step-code">backend/</span></td>
+            <td><span class="step-code">8000</span></td>
+            <td>解析文档、调用 OCR、调用模型、提供后端管理页</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="limit-section">
+      <h3 style="font-size:1.15rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--primary);display:inline-block;"></span> 推荐部署顺序</h3>
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-text">登录 <a href="https://tcb.cloud.tencent.com/dev" target="_blank" style="color:var(--primary);">CloudBase 控制台</a>，创建或选择一个云开发环境</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-text">先部署后端云托管服务 <span class="step-code">contract-analyzer-backend</span>，并配置模型、OCR、管理员口令等后端环境变量</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-text">访问 <span class="step-code">/api/health</span> 检查后端可用，再访问 <span class="step-code">/admin?token={BACKEND_ADMIN_TOKEN}</span> 检查管理页</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-text">如需反馈管理，创建 Neon PostgreSQL 数据库，复制 <span class="step-code">DATABASE_URL</span> 连接串</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <div class="step-text">再部署前端云托管服务 <span class="step-code">contract-analyzer-frontend</span>，配置后端地址和反馈数据库环境变量</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">6</div>
+          <div class="step-content">
+            <div class="step-text">打开前端地址，分别上传 DOCX、DOC、PDF、JPG、PNG 文件完成验收；扫描件依赖腾讯云 OCR 密钥</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <table class="styled-table">
+      <thead>
+        <tr><th>位置</th><th>环境变量</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-info">后端</span></td>
+          <td><span class="step-code">BACKEND_ADMIN_TOKEN</span></td>
+          <td>后端管理页访问口令，访问地址为 <span class="step-code">/admin?token={口令}</span></td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-info">后端</span></td>
+          <td><span class="step-code">OPENAI_API_KEY</span> / <span class="step-code">OPENAI_BASE_URL</span> / <span class="step-code">OPENAI_MODEL</span></td>
+          <td>管理员配置的全局模型；用户在前端设置自己的模型时，优先使用用户模型</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-info">后端</span></td>
+          <td><span class="step-code">TENCENTCLOUD_SECRET_ID</span> / <span class="step-code">TENCENTCLOUD_SECRET_KEY</span> / <span class="step-code">ENABLE_OCR=true</span></td>
+          <td>腾讯云 OCR 配置，用于 JPG、PNG 和扫描 PDF 的文字识别</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-primary">前端</span></td>
+          <td><span class="step-code">NEXT_PUBLIC_BACKEND_API_BASE_URL</span> / <span class="step-code">BACKEND_API_BASE_URL</span></td>
+          <td>后端服务根地址；用于把上传分析请求转发到后端</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-primary">前端</span></td>
+          <td><span class="step-code">DATABASE_URL</span> / <span class="step-code">PG_SSL=true</span></td>
+          <td>Neon PostgreSQL 反馈库，仅影响反馈管理和云端总览，不影响合同解析</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note-box">
+      <div class="note-icon">📘</div>
+      <div>
+        完整的小白部署步骤、CloudBase 访问入口、腾讯云 OCR 密钥获取方式、Neon 数据库创建方式和验收清单，请查看
+        <a href="./v6部署交付文档.md" target="_blank" style="color:var(--primary);font-weight:600;">docs/v6部署交付文档.md</a>。
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 5: Limits -->
+  <div class="section" id="sec-limits">
+    <div class="section-title"><div class="icon">⚠️</div> 当前限制</div>
+
+    <!-- 5.1 Platform Limits -->
+    <div class="limit-section">
+      <h3 style="font-size:1.15rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--warning);display:inline-block;"></span> 平台版本（v4）限制</h3>
+      <table class="styled-table">
+        <thead><tr><th>限制项</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-warning">环境 QPS</span></td><td>标准版：<strong>500 QPS</strong>；企业版：1000 QPS</td></tr>
+          <tr><td><span class="badge badge-danger">请求超时</span></td><td>云托管统一 <strong>60 秒</strong>超时</td></tr>
+          <tr><td><span class="badge badge-info">请求包体</span></td><td>最大 <strong>20 MB</strong></td></tr>
+          <tr><td><span class="badge badge-warning">数据库</span></td><td>标准版为共享实例；企业版以上为独享实例</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5.2 Skill Limits -->
+    <div class="limit-section" style="margin-top:24px;">
+      <h3 style="font-size:1.15rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--info);display:inline-block;"></span> Skill 版本（v5）限制</h3>
+      <table class="styled-table">
+        <thead><tr><th>限制项</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-warning">仅支持单份</span></td><td>不支持批量分析，每次只能分析一份合同</td></tr>
+          <tr><td><span class="badge badge-info">仅支持 DOCX</span></td><td>不支持 PDF、DOC、扫描件（需先用其他工具转换）</td></tr>
+          <tr><td><span class="badge badge-success">无历史记录</span></td><td>分析结果不保存，每次需重新分析</td></tr>
+          <tr><td><span class="badge badge-accent">AI 平台依赖</span></td><td>Skill / 对话方式依赖 AI 平台的模型能力和文件解析能力</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5.3 Latency -->
+    <div class="limit-section" style="margin-top:24px;">
+      <h3 style="font-size:1.15rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--warning);display:inline-block;"></span> 模型响应延迟</h3>
+      <div class="intro-card" style="margin-bottom:16px;font-size:0.92rem;">一次完整的合同分析流程中，延迟主要受以下因素影响：</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;">
+        <div style="background:var(--card-bg);border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);">
+          <div style="font-weight:600;font-size:0.92rem;margin-bottom:8px;">📄 合同长度</div>
+          <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:6px;">文本越长，模型输入 token 越多，推理时间越长</div>
+          <div style="font-size:0.85rem;font-family:monospace;background:#f1f5f9;padding:6px 10px;border-radius:6px;">5页 ≈ 5-10s · 20页 ≈ 15-30s</div>
+        </div>
+        <div style="background:var(--card-bg);border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow);border:1px solid var(--border);">
+          <div style="font-weight:600;font-size:0.92rem;margin-bottom:8px;">🧠 模型服务</div>
+          <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:6px;">不同模型 / 不同提供商的推理速度差异很大</div>
+          <div style="font-size:0.85rem;font-family:monospace;background:#f1f5f9;padding:6px 10px;border-radius:6px;">GPT-4.1-mini: 3-8s/页</div>
+        </div>
+      </div>
+      <div class="note-box">
+        <div class="note-icon">📝</div>
+        <div><strong>总结：</strong>单份合同分析典型耗时 5-30 秒，主要由模型推理决定。Skill 版本为 AI 平台工作流，无浏览器开销，响应速度与平台版本相当。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 6: Qiqi Integration Decision -->
+  <div class="section" id="sec-qiqi">
+    <div class="section-title"><div class="icon">🔗</div> 企企集成判断</div>
+
+    <div class="intro-card">
+      <div class="lead">结合企企合同新增页面的实际录入方式，暂不进行“先在企企保存合同，再由本平台拉取附件、解析并回写”的流程。原因是企企保存前通常已经要求填写合同编号、供应商、项目、日期、金额、明细等必填项，业务人员为了保存附件，仍然需要先人工完成大量录入。</div>
+    </div>
+
+    <div class="limit-section">
+      <h3><span class="severity-dot severity-medium"></span> 为什么会多一圈</h3>
+      <div class="step-list">
+        <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-text">业务人员进入企企新增合同页面，上传合同附件。</div></div></div>
+        <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-text">为了保存合同，仍需先人工填写企企要求的必填字段。</div></div></div>
+        <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-text">保存后，本平台再拉取附件并解析，随后还要回写或人工对照修改企企字段。</div></div></div>
+      </div>
+      <div class="warning-box" style="margin-top:16px;"><div class="warn-icon">⚠️</div><div>这条链路技术上可行，但没有解决“保存前就要录入字段”的核心痛点，反而增加跨系统切换和重复确认。</div></div>
+    </div>
+
+    <div class="limit-section">
+      <h3><span class="severity-dot severity-low"></span> 更优方向：在企企页面内增加合同解析</h3>
+      <table class="styled-table">
+        <thead><tr><th>环节</th><th>理想动作</th><th>价值</th></tr></thead>
+        <tbody>
+          <tr><td>上传附件</td><td>业务人员在企企新增合同页面上传合同文件</td><td>保持原有工作入口</td></tr>
+          <tr><td>触发解析</td><td>点击“合同解析”或“生成付款计划”</td><td>在保存前生成字段草稿</td></tr>
+          <tr><td>自动回填</td><td>回填基础信息、合同标的明细、付款计划明细</td><td>减少人工录入</td></tr>
+          <tr><td>人工校对</td><td>业务人员只确认低置信度字段和关键金额日期</td><td>保留业务控制权</td></tr>
+          <tr><td>保存提交</td><td>确认后在企企内保存或提交审批</td><td>形成顺滑闭环</td></tr>
+        </tbody>
+      </table>
+      <div class="note-box"><div class="note-icon">💡</div><div>该方向需要企企平台人员配合，在页面中增加解析入口、读取当前上传附件、调用合同智能分析服务，并允许把返回结果回填到当前表单。</div></div>
+    </div>
+
+    <div class="limit-section">
+      <h3><span class="severity-dot severity-low"></span> 当前平台的阶段定位</h3>
+      <div class="func-limit-list">
+        <div class="func-limit-item"><div class="fl-icon">📄</div><div><div class="fl-title">字段提取辅助</div><div class="fl-desc">在企企页面解析能力上线前，先上传合同文件，提取供应商、金额、日期、税率、付款计划等字段。</div></div></div>
+        <div class="func-limit-item"><div class="fl-icon">🧾</div><div><div class="fl-title">付款计划识别</div><div class="fl-desc">辅助拆分预付款、到货款、验收款、质保金等节点，减少业务人员逐条阅读合同条款的时间。</div></div></div>
+        <div class="func-limit-item"><div class="fl-icon">⚠️</div><div><div class="fl-title">录入前检查</div><div class="fl-desc">提前发现付款比例合计、关键日期、金额、质保条款等潜在问题，避免带着问题进入企企审批。</div></div></div>
+        <div class="func-limit-item"><div class="fl-icon">🧩</div><div><div class="fl-title">为企企内嵌能力沉淀规则</div><div class="fl-desc">先沉淀字段结构、提示规则和付款计划识别逻辑，后续再迁入企企页面形成真正闭环。</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 7: Verify -->
+  <div class="section" id="sec-verify">
+    <div class="section-title"><div class="icon">✅</div> 快速验证步骤</div>
+
+    <div class="intro-card">
+      <div class="lead"><strong>平台版本验证步骤：</strong></div>
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-text">CloudBase 云托管中新建服务，上传 <span class="step-code">frontend/Dockerfile</span> 并配置环境变量</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-text">等待构建完成（约 2-3 分钟）</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-text">访问服务公网地址，确认首页可打开</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-text">进入「设置」页面，点击「模型联通测试」确认 AI 服务可用</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-text">上传一份 DOCX 合同文件，执行分析，验证结果正常输出</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="intro-card" style="margin-top:32px;">
+      <div class="lead"><strong>Skill AI 平台验证步骤：</strong></div>
+    </div>
+
+    <div class="step-list">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-text">在 AI 平台（Codex / Claude / WorkBuddy）中，提供 Skill 安装链接：<span class="step-code">https://github.com/Memory555/contract-analyzer/releases/download/v5.0.0/contract-analyzer-skill.zip</span></div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-text">确认 Skill 安装成功，平台提示"合同智能分析 Skill 已加载"</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-text">上传一份 DOCX 合同文件，输入"利用 contract-analyzer-skill 分析这份合同"</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-text">确认 AI 输出包含付款计划表格、质保明细表格和合同问题列表</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">合同智能分析平台 v6 · 2026-06-30 · <a href="https://github.com/Memory555/contract-analyzer" target="_blank" style="color:var(--primary);">GitHub</a> · <a href="https://github.com/Memory555/contract-analyzer/releases" target="_blank" style="color:var(--primary);">Releases</a></div>
+
+<script>
+  // Tab Navigation
+  const tabs = document.querySelectorAll('.nav-tab');
+  const sections = {
+    overview: document.getElementById('sec-overview'),
+    skill: document.getElementById('sec-skill'),
+    tech: document.getElementById('sec-tech'),
+    deploy: document.getElementById('sec-deploy'),
+    limits: document.getElementById('sec-limits'),
+    qiqi: document.getElementById('sec-qiqi'),
+    verify: document.getElementById('sec-verify'),
+  };
+
+  function switchTab(key) {
+    tabs.forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-tab="${key}"]`).classList.add('active');
+    Object.values(sections).forEach(s => s.classList.remove('visible'));
+    sections[key].classList.add('visible');
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const key = tab.dataset.tab;
+      switchTab(key);
+    });
+  });
+
+  // Usage panel switching
+  const usagePanels = {
+    ai: document.getElementById('usage-ai'),
+    chat: document.getElementById('usage-chat'),
+  };
+
+  const usageCards = document.querySelectorAll('.usage-card');
+
+  function showUsage(key) {
+    // Hide all panels
+    Object.values(usagePanels).forEach(p => p.classList.remove('visible'));
+    // Remove active from all cards
+    usageCards.forEach(c => c.classList.remove('active'));
+    // Show selected panel
+    if (usagePanels[key]) {
+      usagePanels[key].classList.add('visible');
+    }
+    // Add active to selected card
+    document.querySelector(`.usage-card.${key}`).classList.add('active');
+  }
+
+  // Default: show AI platform as default since it's the recommended way
+  showUsage('ai');
+
+  // Expose to global scope for links
+  window.switchTab = switchTab;
+  window.showUsage = showUsage;
+</script>
+
+</body>
+</html>
