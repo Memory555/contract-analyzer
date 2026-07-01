@@ -1,0 +1,66 @@
+version: "3.8"
+
+# ===== 本地测试：docker compose up -d =====
+# ===== 生产部署：把 build 段注释掉，用 image 指向上传到 Docker Hub 的镜像 =====
+
+services:
+  # ─────── 后端：合同解析 + LLM 分析 ───────
+  backend:
+    # === 本地构建（测试用）===
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    # === 生产部署（取消下面 image 注释，注释掉上面的 build）===
+    # image: <你的DockerHub用户名>/contract-analyzer-backend:latest
+    container_name: contract-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_VERSION=v6.0.0
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4.1-mini}
+      - BACKEND_ADMIN_TOKEN=${BACKEND_ADMIN_TOKEN:-}
+      - RUNTIME_CONFIG_PATH=data/model-config.json
+      - MAX_UPLOAD_MB=${MAX_UPLOAD_MB:-20}
+      - MAX_BATCH_FILES=${MAX_BATCH_FILES:-20}
+      - ENABLE_OCR=${ENABLE_OCR:-true}
+      - TENCENTCLOUD_SECRET_ID=${TENCENTCLOUD_SECRET_ID:-}
+      - TENCENTCLOUD_SECRET_KEY=${TENCENTCLOUD_SECRET_KEY:-}
+      - TENCENTCLOUD_OCR_REGION=${TENCENTCLOUD_OCR_REGION:-ap-guangzhou}
+      - ENABLE_DOC_CONVERT=${ENABLE_DOC_CONVERT:-true}
+      - LIBREOFFICE_PATH=${LIBREOFFICE_PATH:-}
+    restart: unless-stopped
+
+  # ─────── 前端：Next.js 15 + API Routes ───────
+  frontend:
+    # === 本地构建（测试用）===
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    # === 生产部署（取消下面 image 注释，注释掉上面的 build）===
+    # image: <你的DockerHub用户名>/contract-analyzer-frontend:latest
+    container_name: contract-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      # 数据库（CloudBase PostgreSQL）
+      - DATABASE_URL=${DATABASE_URL}
+      - PG_HOST=${PG_HOST}
+      - PG_PORT=${PG_PORT:-5432}
+      - PG_USER=${PG_USER}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - PG_DATABASE=${PG_DATABASE:-postgres}
+      - PG_SSL=${PG_SSL:-true}
+      - PG_SSL_REJECT_UNAUTHORIZED=${PG_SSL_REJECT_UNAUTHORIZED:-false}
+      # 后端地址（容器间通过 service name 通信）
+      - NEXT_PUBLIC_BACKEND_API_BASE_URL=http://backend:8000
+      - BACKEND_API_BASE_URL=http://backend:8000
+      # LLM（前端也可能直接调用）
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4.1-mini}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
+    depends_on:
+      - backend
+    restart: unless-stopped

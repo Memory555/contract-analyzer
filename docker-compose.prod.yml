@@ -1,0 +1,36 @@
+# ===== CloudBase 服务器部署专用 =====
+# 使用前提：已通过 docker save/load 将镜像传到服务器
+# 服务器上执行：docker compose -f docker-compose.prod.yml up -d
+
+services:
+  backend:
+    image: penny3687/contract-analyzer-backend:latest
+    container_name: contract-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_VERSION=v6.0.0
+      - OPENAI_API_KEY=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
+      - OPENAI_BASE_URL=https://integrate.api.nvidia.com/v1
+      - OPENAI_MODEL=openai/gpt-oss-120b
+      - MAX_UPLOAD_MB=20
+      - MAX_BATCH_FILES=20
+      - ENABLE_OCR=false
+      - ENABLE_DOC_CONVERT=true
+    restart: unless-stopped
+
+  frontend:
+    image: penny3687/contract-analyzer-frontend:latest
+    container_name: contract-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://neondb_owner:npg_NFKJCf1M6Dme@ep-dark-wildflower-aoefhhjb-pooler.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=verify-full&channel_binding=require
+      - PG_SSL=true
+      - PG_SSL_REJECT_UNAUTHORIZED=false
+      - NEXT_PUBLIC_BACKEND_API_BASE_URL=http://backend:8000
+      - BACKEND_API_BASE_URL=http://backend:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
